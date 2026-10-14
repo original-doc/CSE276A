@@ -1,0 +1,10 @@
+[Unit]
+Description=CSE276A robot hotspot recovery check
+Requires=NetworkManager.service
+After=NetworkManager.service
+ConditionPathExists=/sys/class/net/wlan0
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/cse276a-hotspot-watchdog
+TimeoutStartSec=35s

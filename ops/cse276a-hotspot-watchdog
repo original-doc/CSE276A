@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# Best-effort recovery for the robot's saved iPhone hotspot profile.
+# This cannot repair an iPhone access point that stops completing WPA handshakes.
+set -euo pipefail
+export LC_ALL=C
+
+interface=wlan0
+profile=Kissshot
+state_dir=/run/cse276a-hotspot-watchdog
+
+install -d -m 0700 "$state_dir"
+exec 9>"$state_dir/lock"
+flock -n 9 || exit 0
+
+# Respect a deliberately disabled Wi-Fi radio and do not displace another
+# healthy connection. GENERAL.STATE is "100 (connected)" when activated.
+[[ "$(nmcli radio wifi)" == enabled ]] || exit 0
+state="$(nmcli -g GENERAL.STATE dev show "$interface" 2>/dev/null | head -n 1 || true)"
+state_code="${state%% *}"
+if [[ "$state_code" == 100 ]]; then
+    if [[ -f "$state_dir/failures" ]]; then
+        logger -t cse276a-hotspot-watchdog "Wi-Fi recovered: $(nmcli -g GENERAL.CONNECTION dev show "$interface")"
+        rm -f "$state_dir/failures"
+    fi
+    exit 0
+fi
+
+# Do not interrupt NetworkManager while it is already authenticating or
+# acquiring an address. The watchdog only takes over an idle disconnection.
+[[ "$state_code" == 30 ]] || exit 0
+
+failures=0
+[[ -f "$state_dir/failures" ]] && read -r failures < "$state_dir/failures"
+failures=$((failures + 1))
+printf '%s\n' "$failures" > "$state_dir/failures"
+
+# Give NetworkManager at least three timer ticks to reconnect by itself.
+(( failures >= 3 )) || exit 0
+now="$(date +%s)"
+last=0
+[[ -f "$state_dir/last_attempt" ]] && read -r last < "$state_dir/last_attempt"
+(( now - last >= 120 )) || exit 0
+printf '%s\n' "$now" > "$state_dir/last_attempt"
+
+logger -t cse276a-hotspot-watchdog "wlan0 state=${state:-unknown}; rescanning and activating $profile"
+nmcli -w 5 dev wifi rescan ifname "$interface" ssid "$profile" || true
+if nmcli -w 20 con up "$profile" ifname "$interface"; then
+    logger -t cse276a-hotspot-watchdog "$profile activation succeeded"
+    rm -f "$state_dir/failures"
+else
+    logger -t cse276a-hotspot-watchdog "$profile activation failed; retry no sooner than 120 s (check WPA/iPhone hotspot)"
+fi
