@@ -1,6 +1,6 @@
 floor: carpet2
 updated: '2026-10-14'
-params: {linear_scale: 1.0, trim: 0.0, track_eff: 0.172, min_cmd: 0.0, rot_cmd: 0.3,
+params: {linear_scale: 1.381, trim: 0.0016, track_eff: 0.172, min_cmd: 0.0, rot_cmd: 0.3,
   rot_rate_ccw: 0.0, rot_rate_cw: 0.0, rot_coast_ccw: 0.0, rot_coast_cw: 0.0, rot_deadband: 0.0,
   gyro_scale: 1.0}
 trials:
@@ -32,3 +32,61 @@ trials:
     note: Segment estimates disagree substantially; original windowed bias and fit are invalid. Active gyro_scale is nominal 1.0, not calibrated from this trial.
   csv: imu_diag_carpet2_20261014_180848.csv
   time: '2026-10-14T18:09:17'
+- test: straight_excluded
+  status: excluded_by_operator_lower_confidence
+  cmd: 0.3
+  duration: 4.0
+  forward_m: 1.74
+  lateral_m: -0.025
+  dist_m: 1.740179588433332
+  linear_scale: 1.4501496570277768
+  trim: 0.0014199737469970028
+  note: Robot completed the default straight drive, then the session was lost before
+    the calibration script could save. Operator confirmed 1.74 m forward and 2.5 cm
+    rightward offset. Gyro heading change was not recoverable. Operator later judged
+    this trial less reliable and excluded it from all future straight-trial averaging.
+  date: '2026-10-14'
+- test: straight
+  status: reconstructed_after_interrupted_run
+  cmd: 0.3
+  duration: 4.0
+  forward_m: 1.69
+  lateral_m: -0.07
+  dist_m: 1.6914490828872146
+  linear_scale: 1.4095409024060122
+  trim: 0.004208318769660959
+  note: Robot completed the default straight drive, then rebooted before the script
+    could save. Operator confirmed 1.69 m forward and corrected the initially reported
+    10 cm rightward offset to 7 cm. Gyro heading change was not recoverable. This
+    trial remains included in the active profile and future averaging.
+  date: '2026-10-14'
+- test: straight
+  status: reconstructed_after_interrupted_run
+  cmd: 0.3
+  duration: 4.0
+  forward_m: 1.65
+  lateral_m: -0.01
+  dist_m: 1.6500303027520433
+  linear_scale: 1.3750252522933695
+  trim: 0.000631749063395284
+  note: Robot completed the default straight drive, then rebooted before the script
+    could save. Operator confirmed 1.65 m forward and 1 cm rightward offset, and
+    considered this measurement very accurate. Gyro heading change was not recoverable.
+    This trial is included in future averaging; the older 1.74 m trial remains excluded.
+  date: '2026-10-14'
+- test: straight
+  status: reconstructed_after_interrupted_run
+  cmd: 0.3
+  duration: 4.0
+  forward_m: 1.63
+  lateral_m: 0.0
+  lateral_measurement: approximately_zero_not_exact
+  dist_m: 1.63
+  linear_scale: 1.3583333333333334
+  trim: 0.0
+  note: Robot completed the default straight drive, then rebooted before the script
+    could save. Operator reported 1.63 m forward and almost no lateral offset, with
+    unchanged commands. Zero offset is an approximation, not a precise measurement.
+    Gyro heading change was not recoverable. This trial is included in averaging;
+    the older 1.74 m trial remains excluded.
+  date: '2026-10-14'
