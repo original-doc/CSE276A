@@ -1,25 +1,27 @@
-# `dev-yuanshengqi` branch-only archive
+# `dev-yuanshengqi` integration inventory
 
-This branch preserves individual field experiments and robot-specific operating
-notes. Do **not** merge the whole branch into `main`. Git has no reliable
-per-file "never merge" flag; integrate reviewed commits or paths explicitly.
+Updated 2026-10-15. This branch now includes the `open_loop` framework through
+merge commit from `a3f578e`. Continue development here; the paths below are the
+work that was unique to `dev-yuanshengqi` before that merge. These labels are
+documentation, not Git merge rules.
 
-As of 2026-10-14, keep these paths on this branch only:
+| Label | Paths | Value and current role |
+| --- | --- | --- |
+| **ACTIVE AUXILIARY** | `tools/` | Standalone SSH keyboard/timed-motion and human-referenced turn/straight tools, usage guide, and four tests. Useful for controlled manual experiments; they are not the `ol_calibrate` or `velocity_control` implementation. Run only one `motor_commands` publisher at a time. |
+| **ROBOT-SPECIFIC** | `ops/` | NetworkManager hotspot recovery timer and script. Keep as a troubleshooting/deployment reference; it is configured for this robot's `wlan0` and `Kissshot` profile, not a portable project default. |
+| **EXPERIMENT ARCHIVE** | `calibration/`, `robot_control/config/floors/carpet2.yaml`, `robot_control/config/diag/imu_diag_carpet2_20261014_180848.csv` | Raw observations, analyses, and older IMU/magnetometer-based experiments, including marble and carpet2. Preserve their provenance; do not feed their parameters into the selected open-loop wood-floor controller without new validation. |
+| **HISTORICAL HANDOFF** | `HANDOFF.md` | Snapshot written on 2026-10-13. It predates the `open_loop` framework and current wood-floor trials; it is not the current runbook. |
 
-- `calibration/` — earlier IMU/magnetometer experiments, raw samples, and
-  one-off calibration scripts. The shared calibration implementation is in
-  `main` under `robot_control/robot_control/` and `HW1/`.
-- `robot_control/config/floors/carpet2.yaml` and
-  `robot_control/config/diag/imu_diag_carpet2_20261014_180848.csv` — personal,
-  partly reconstructed carpet2 observations; not a team-approved floor profile.
-- `HANDOFF.md` — dated personal handoff and machine-specific operating notes.
-- `ops/` — hotspot recovery service tied to one robot and the saved `Kissshot`
-  Wi-Fi profile. It needs team review and configuration before reuse elsewhere.
-- This `BRANCH_ONLY.md` inventory itself.
+The selected control path is the merged `robot_control/robot_control/ol_*` code,
+`velocity_control.py`, and the waypoint/configuration files from `open_loop`.
+`robot_control/config/open_loop/wood.yaml` is only a template. The measured
+`study_wood.yaml` and `study_wood2.yaml` were saved separately in
+`codex/study-wood-calibration`; that cloud snapshot lacks later robot-side
+`verify` records and demo logs. Recover the latest robot copy before treating
+either profile as the active floor calibration in this branch.
 
-The reviewed shared addition is `tools/` (the standalone SSH keyboard teleop,
-tests, and usage guide), originally committed as `aa2e2d7`. Integrate that
-commit selectively; do not use `git merge dev-yuanshengqi` for this scope.
-
-This file is a documented merge decision, **not** a Git enforcement mechanism.
-Revisit the decision if the team later wants any archived experiment or ops tool.
+Do not merge this entire branch into `main` just to transfer the auxiliary or
+historical files. Review the intended paths first. Conversely, merging
+`open_loop` into this branch is intentional and does not make those archived
+files part of the open-loop runtime. Preserve this inventory when deciding
+which files should eventually be shared with the team.
