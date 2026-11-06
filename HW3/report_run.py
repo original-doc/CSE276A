@@ -306,14 +306,15 @@ def style(ax):
     ax.tick_params(colors=MUTED, labelcolor=INK)
 
 
-LAP_COLORS = ['#9ecae1', '#4292c6', '#08306b']      # light -> dark blue, lap 1 -> 3
+TRAJ_LAP_COLORS = [SERIES[7], SERIES[4], SERIES[0]]     # red, pink, blue: lap 1 -> 3
+LM_LAP_COLORS = ['#f7c59f', '#f29a5c', SERIES[1]]        # light -> full orange: lap 1 -> 3
 
 
-def lap_color(lap, n_laps):
-    """Colour of lap `lap` (1-based) when there are n_laps laps."""
+def lap_color(lap, n_laps, palette):
+    """Colour of lap `lap` (1-based) out of n_laps, spread over the palette."""
     if n_laps <= 1:
-        return LAP_COLORS[-1]
-    return LAP_COLORS[round((lap - 1) * (len(LAP_COLORS) - 1) / (n_laps - 1))]
+        return palette[-1]
+    return palette[round((lap - 1) * (len(palette) - 1) / (n_laps - 1))]
 
 
 def lap_of_rows(phase):
@@ -347,7 +348,8 @@ def plot_map(phase, truth, out_path):
         if idx[0] > 0:
             idx = [idx[0] - 1] + idx
         ax.plot([traj[k].x for k in idx], [traj[k].y for k in idx], '-',
-                color=lap_color(lap, n_laps), lw=2, label=f'trajectory lap {lap}',
+                color=lap_color(lap, n_laps, TRAJ_LAP_COLORS), lw=2,
+                label=f'trajectory lap {lap}',
                 zorder=2 + lap)
     goals = [map_eval.to_arena(T, Pose2(float(w['goal_x']), float(w['goal_y']), 0.0))
              for w in phase['wps']]
@@ -364,10 +366,11 @@ def plot_map(phase, truth, out_path):
     for lap, snap in snaps[:-1]:
         est = map_eval.poses_to_arena(T, map_eval.snapshot_poses(snap))
         ax.scatter([p.x for p in est.values()], [p.y for p in est.values()], s=40,
-                   facecolors='none', edgecolors=lap_color(lap, n_laps), lw=1.5, zorder=7,
+                   facecolors='none', edgecolors=lap_color(lap, n_laps, LM_LAP_COLORS), lw=1.5,
+                   zorder=7,
                    label=f'map after lap {lap}')
     last_lap, final = snaps[-1]
-    fc = lap_color(last_lap, n_laps)
+    fc = lap_color(last_lap, n_laps, LM_LAP_COLORS)
     est = map_eval.poses_to_arena(T, map_eval.snapshot_poses(final))
     for k, m in enumerate(final['landmarks']):
         p = est[m['id']]
