@@ -201,6 +201,11 @@ def error_table(phase, truth):
             s = map_eval.mean_error(me)
             lines.append(f'- **mean error, {label}: {cm(s["mean"])} cm** (rms {cm(s["rms"])}, '
                          f'max {cm(s["max"])} cm, mean |ψ| {math.degrees(s["mean_yaw"]):.1f}°)')
+    scale, res = map_eval.similarity_errors(map_eval.snapshot_poses(snap), truth)
+    if scale is not None:
+        lines.append(f'- mean error after rigid fit **with scale**: {cm(res)} cm; the map is '
+                     f'**{1 / scale:.3f}×** the truth (a uniform scale error, e.g. tag size or '
+                     f'arena size)')
     me = measured or aligned
     if me and me.missing:
         lines.append(f'- never mapped: {me.missing}')
@@ -248,14 +253,18 @@ def phase_markdown(phase, truth):
 def comparison_markdown(phases, truth):
     lines = ['## Square vs octagon (final maps)', '',
              '| phase | laps | landmarks | mean error (cm) | after rigid fit (cm) | '
-             'lap 1 error (cm) | mean σ lap 1 → last (cm) | drive (m) | turns |',
-             '|' + '---|' * 9]
+             'with scale (cm) | map / truth | lap 1 error (cm) | mean σ lap 1 → last (cm) | '
+             'drive (m) | turns |', '|' + '---|' * 11]
     for p in phases:
         rows = lap_rows(p, truth)
         first, last = rows[0], rows[-1]
         m = motion(p['steps'])
+        scale, res = map_eval.similarity_errors(
+            map_eval.snapshot_poses(final_snapshot(p)), truth)
+        ratio = f'{1 / scale:.3f}' if scale else '—'
         lines.append(f'| {p["name"]} | {len(rows)} | {last["n"]} | {cm(last["err"])} | '
-                     f'{cm(last["aligned"])} | {cm(first["err"])} | {cm(first["sigma"])} → '
+                     f'{cm(last["aligned"])} | {cm(res)} | {ratio} | {cm(first["err"])} | '
+                     f'{cm(first["sigma"])} → '
                      f'{cm(last["sigma"])} | {m["drive_m"]:.1f} | {m["spins"]} |')
     return lines
 

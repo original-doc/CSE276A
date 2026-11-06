@@ -1,0 +1,466 @@
+log: /home/ubuntu/ros2_ws/src/CSE276A/HW3/logs/run_20261106_091125
+starting in 3...
+starting in 2...
+starting in 1...
+=== phase square: 15 vertices, 3 laps; map frame = current pose; measure it into /home/ubuntu/ros2_ws/src/CSE276A/HW3/logs/run_20261106_091125/square/start.yaml
+  look: 2 frames, tags [], rejected {0: 'only 1 frames', 1: 'only 1 frames'}
+  drive fwd   0.750 m   cmd 0.30  T 1.96 s
+  look: 3 frames, tags [0@1.10m]
+  drive fwd   0.221 m   cmd 0.30  T 0.62 s  !! T = 0.62 s outside calibrated 2-4 s
+  look: 7 frames, tags [0@0.86m]
+  drive fwd   0.067 m   cmd 0.30  T 0.23 s  !! T = 0.23 s outside calibrated 2-4 s
+  look: 2 frames, tags [], rejected {0: 'only 2 frames'}
+  spin  ccw  89.636 deg cmd 0.35  T 0.63 s
+  look: 12 frames, tags [2@2.42m, 3@2.78m], rejected {1: 'out of range (d 1.51 m, oblique 60 deg)'}
+>>> square lap 1 vertex 1 reached: estimate (+1.061, +0.001, +90.0 deg), 5 looks, tags [0] 
+  look: 15 frames, tags [2@2.42m, 3@2.78m], rejected {1: 'out of range (d 1.51 m, oblique 60 deg)'}
+  drive fwd   0.750 m   cmd 0.30  T 1.96 s
+  look: 2 frames, tags [], rejected {2: 'only 2 frames'}
+  drive fwd   0.647 m   cmd 0.30  T 1.69 s
+  look: 4 frames, tags [2@0.89m]
+  spin  ccw  84.957 deg cmd 0.35  T 0.60 s
+  look: 12 frames, tags [4@2.51m, 5@2.81m]
+>>> square lap 1 vertex 2 reached: estimate (+1.013, +1.573, +180.0 deg), 4 looks, tags [2] 
+  look: 12 frames, tags [4@2.51m, 5@2.81m]
+  drive fwd   0.750 m   cmd 0.30  T 1.96 s
+  look: 7 frames, tags [4@1.69m]
+  spin  ccw   5.953 deg cmd 0.25  T 0.26 s
+  look: 2 frames, tags [], rejected {4: 'only 1 frames', 5: 'only 1 frames'}
+  drive fwd   0.605 m   cmd 0.30  T 1.59 s  !! T = 1.59 s outside calibrated 2-4 s
+  look: 3 frames, tags [4@1.03m]
+  spin  ccw  78.660 deg cmd 0.35  T 0.56 s
+  look: 6 frames, tags [5@1.67m]
+>>> square lap 1 vertex 3 reached: estimate (-0.399, +1.453, -90.0 deg), 5 looks, tags [4] 
+  look: 7 frames, tags [5@1.67m]
+  drive fwd   0.750 m   cmd 0.30  T 1.96 s
+  look: 6 frames, tags [6@1.64m]
+  drive fwd   0.602 m   cmd 0.30  T 1.58 s  !! T = 1.58 s outside calibrated 2-4 s
+  look: 2 frames, tags [], rejected {6: 'only 2 frames'}
+  spin  cw    5.388 deg cmd 0.25  T 0.12 s
+  look: 0 frames, tags []
+  spin  cw    5.388 deg cmd 0.25  T 0.12 s
+  look: 0 frames, tags []
+  drive fwd   0.107 m   cmd 0.30  T 0.33 s  !! T = 0.33 s outside calibrated 2-4 s
+  look: 0 frames, tags []
+  spin  ccw 100.777 deg cmd 0.35  T 0.71 s
+  look: 3 frames, tags [], rejected {7: 'out of range (d 1.81 m, oblique 61 deg)', 0: 'only 1 frames', 1: 'only 1 frames'}
+  spin  ccw   3.973 deg cmd 0.25  T 0.15 s
+  look: 18 frames, tags [0@2.69m, 1@2.94m], rejected {7: 'out of range (d 1.82 m, oblique 61 deg)'}
+>>> square lap 1 vertex 4 NOT reached: estimate (-0.817, +0.423, -21.9 deg), 8 looks, tags [0] no calibrated level for Move(kind='spin', value=-0.459907722753379)
+  look: 18 frames, tags [0@2.69m, 1@2.94m], rejected {7: 'out of range (d 1.82 m, oblique 61 deg)'}
+  drive fwd   0.750 m   cmd 0.30  T 1.96 s
+  look: 10 frames, tags [0@1.87m, 1@2.26m]
+  spin  ccw   4.360 deg cmd 0.25  T 0.17 s
+  look: 10 frames, tags [0@1.87m, 1@2.27m]
+--- square lap 1 done: 5 landmarks
+   id       x       y     psi      sx     sy  spsi  upd
+    0  +1.836  +0.177  +175.8   0.161  0.083   4.4  5
+    2  +0.686  +2.388   -91.4   0.560  0.106  13.2  2
+    4  -1.415  +1.510    -7.1   0.325  0.429  11.2  1
+    6  -0.311  -0.740   +88.5   0.247  0.201  13.2  0
+    1  +1.925  +1.193  +174.7   0.192  0.099   8.4  1
+>>> square lap 1 vertex 5 reached: estimate (-0.024, +0.035, -2.5 deg), 3 looks, tags [0, 1] 
+  look: 8 frames, tags [0@1.87m, 1@2.27m]
+  drive fwd   0.750 m   cmd 0.30  T 1.96 s
+  look: 3 frames, tags [0@1.04m]
+  drive fwd   0.253 m   cmd 0.30  T 0.70 s  !! T = 0.70 s outside calibrated 2-4 s
+  look: 9 frames, tags [0@0.76m]
+  spin  ccw  88.104 deg cmd 0.35  T 0.62 s
+  look: 24 frames, tags [2@2.40m, 3@2.76m], rejected {1: 'out of range (d 1.48 m, oblique 61 deg)'}
+>>> square lap 2 vertex 6 reached: estimate (+1.090, +0.019, +85.3 deg), 4 looks, tags [0, 1, 2] 
+  look: 30 frames, tags [2@2.40m, 3@2.77m], rejected {1: 'out of range (d 1.48 m, oblique 61 deg)'}
+  spin  ccw   5.687 deg cmd 0.25  T 0.24 s
+  look: 18 frames, tags [3@2.77m], rejected {1: 'out of range (d 1.49 m, oblique 60 deg)'}
+  drive fwd   0.750 m   cmd 0.30  T 1.96 s
+  look: 20 frames, tags [2@1.55m, 3@2.05m]
+  spin  cw    5.279 deg cmd 0.25  T 0.12 s
+  look: 10 frames, tags [3@2.03m]
+  spin  cw    5.728 deg cmd 0.25  T 0.13 s
+  look: 10 frames, tags [2@1.55m]
+  drive fwd   0.528 m   cmd 0.30  T 1.40 s  !! T = 1.40 s outside calibrated 2-4 s
+  look: 8 frames, tags [2@0.98m]
+  spin  ccw  89.729 deg cmd 0.35  T 0.64 s
+  look: 18 frames, tags [4@2.49m, 5@2.75m]
+  spin  ccw   4.701 deg cmd 0.25  T 0.19 s
+  look: 16 frames, tags [4@2.49m, 5@2.76m]
+  spin  ccw   5.796 deg cmd 0.25  T 0.25 s
+  look: 16 frames, tags [4@2.48m, 5@2.78m]
+>>> square lap 2 vertex 7 reached: estimate (+0.990, +1.463, -176.7 deg), 9 looks, tags [2, 3, 4] 
+  look: 18 frames, tags [4@2.48m, 5@2.78m]
+  spin  cw    5.887 deg cmd 0.25  T 0.14 s
+  look: 18 frames, tags [4@2.48m, 5@2.77m]
+  drive fwd   0.750 m   cmd 0.30  T 1.96 s
+  look: 18 frames, tags [4@1.65m, 5@2.05m]
+  drive fwd   0.487 m   cmd 0.30  T 1.29 s  !! T = 1.29 s outside calibrated 2-4 s
+  look: 9 frames, tags [4@1.12m]
+>>> square lap 2 vertex 8 NOT reached: estimate (-0.376, +1.476, -175.0 deg), 4 looks, tags [4] no calibrated level for Move(kind='spin', value=-0.44872595056877174)
+  look: 10 frames, tags [4@1.12m]
+  spin  ccw  82.181 deg cmd 0.35  T 0.58 s
+  look: 18 frames, tags [5@1.70m, 7@2.52m]
+  spin  ccw   6.692 deg cmd 0.25  T 0.30 s
+  look: 26 frames, tags [5@1.70m, 6@2.34m], rejected {7: 'unstable (std 0.040 m)'}
+  drive fwd   0.750 m   cmd 0.30  T 1.96 s
+  look: 20 frames, tags [6@1.48m, 7@1.82m]
+  spin  cw    5.416 deg cmd 0.25  T 0.12 s
+  look: 10 frames, tags [6@1.48m]
+  drive fwd   0.542 m   cmd 0.30  T 1.43 s  !! T = 1.43 s outside calibrated 2-4 s
+  look: 9 frames, tags [6@0.89m]
+  spin  cw   36.302 deg cmd 0.35  T 0.22 s  !! adjusted T = 0.22 s outside calibrated 0.4-1.6 s
+  look: 8 frames, tags [6@0.89m]
+  spin  ccw 110.179 deg cmd 0.35  T 0.77 s
+  look: 20 frames, tags [0@2.23m, 7@1.45m]
+  spin  ccw   5.173 deg cmd 0.25  T 0.21 s
+  look: 27 frames, tags [0@2.23m, 1@2.51m, 7@1.45m]
+  spin  ccw   5.416 deg cmd 0.25  T 0.23 s
+  look: 30 frames, tags [0@2.23m, 1@2.53m, 7@1.45m]
+>>> square lap 2 vertex 9 reached: estimate (-0.389, +0.073, -3.3 deg), 10 looks, tags [0, 1, 4, 5, 6, 7] 
+  look: 27 frames, tags [0@2.23m, 1@2.53m, 7@1.45m]
+--- square lap 2 done: 8 landmarks
+   id       x       y     psi      sx     sy  spsi  upd
+    0  +1.833  +0.200  +177.0   0.161  0.072   3.7  12
+    2  +0.793  +2.409   -93.6   0.243  0.052   4.9  7
+    4  -1.346  +1.267    +3.7   0.182  0.188   4.8  9
+    6  -0.314  -0.784   +91.0   0.176  0.092   4.4  5
+    1  +1.878  +1.227  +177.3   0.179  0.081   4.4  5
+    3  -0.240  +2.470   -95.5   0.241  0.126   8.1  1
+    5  -1.330  +0.238    +3.3   0.167  0.177   6.5  2
+    7  +0.730  -0.817   +90.7   0.172  0.055   4.9  4
+>>> square lap 2 vertex 10 reached: estimate (-0.391, +0.081, -3.5 deg), 1 looks, tags [0, 1, 7] remaining spin is below the smallest step
+  look: 27 frames, tags [0@2.23m, 1@2.53m, 7@1.45m]
+  drive fwd   0.750 m   cmd 0.30  T 1.96 s
+  look: 18 frames, tags [0@1.39m, 1@1.84m]
+  spin  cw    5.380 deg cmd 0.25  T 0.12 s
+  look: 8 frames, tags [0@1.39m]
+  drive fwd   0.516 m   cmd 0.30  T 1.37 s  !! T = 1.37 s outside calibrated 2-4 s
+  look: 10 frames, tags [0@0.85m]
+>>> square lap 3 vertex 11 NOT reached: estimate (+1.002, +0.037, -0.4 deg), 4 looks, tags [0, 1, 7] no calibrated level for Move(kind='spin', value=-0.5599134936146745)
+  look: 10 frames, tags [0@0.85m]
+  spin  ccw  88.216 deg cmd 0.35  T 0.62 s
+  look: 30 frames, tags [1@1.52m, 2@2.36m, 3@2.68m]
+  spin  ccw   4.124 deg cmd 0.25  T 0.16 s
+  look: 20 frames, tags [1@1.51m, 3@2.69m]
+  spin  ccw   3.119 deg cmd 0.25  T 0.10 s
+  look: 18 frames, tags [1@1.51m, 3@2.69m]
+  drive fwd   0.750 m   cmd 0.30  T 1.96 s
+  look: 18 frames, tags [2@1.50m, 3@1.96m]
+  drive fwd   0.466 m   cmd 0.30  T 1.24 s  !! T = 1.24 s outside calibrated 2-4 s
+  look: 9 frames, tags [2@0.98m]
+  spin  cw   42.109 deg cmd 0.35  T 0.26 s  !! adjusted T = 0.26 s outside calibrated 0.4-1.6 s
+  look: 10 frames, tags [2@0.98m]
+  spin  cw    6.754 deg cmd 0.25  T 0.16 s
+  look: 0 frames, tags []
+  drive fwd   0.057 m   cmd 0.30  T 0.20 s  !! T = 0.20 s outside calibrated 2-4 s
+  look: 0 frames, tags []
+  spin  ccw 123.082 deg cmd 0.35  T 0.86 s
+  look: 20 frames, tags [4@2.36m, 5@2.63m]
+  spin  ccw   4.831 deg cmd 0.25  T 0.20 s
+  look: 20 frames, tags [4@2.35m, 5@2.65m]
+  spin  ccw   5.886 deg cmd 0.25  T 0.25 s
+  look: 20 frames, tags [4@2.34m, 5@2.65m]
+>>> square lap 3 vertex 12 reached: estimate (+1.038, +1.503, +179.1 deg), 12 looks, tags [0, 1, 2, 3, 4, 5] 
+  look: 18 frames, tags [4@2.34m, 5@2.65m]
+  drive fwd   0.750 m   cmd 0.30  T 1.96 s
+  look: 18 frames, tags [4@1.51m, 5@1.92m]
+  drive fwd   0.539 m   cmd 0.30  T 1.42 s  !! T = 1.42 s outside calibrated 2-4 s
+  look: 10 frames, tags [4@0.91m]
+  spin  cw   42.388 deg cmd 0.35  T 0.26 s  !! adjusted T = 0.26 s outside calibrated 0.4-1.6 s
+  look: 10 frames, tags [4@0.91m]
+  spin  ccw 111.905 deg cmd 0.35  T 0.78 s
+  look: 17 frames, tags [5@1.50m, 7@2.52m]
+  spin  ccw   5.924 deg cmd 0.25  T 0.25 s
+  look: 18 frames, tags [5@1.50m, 6@2.24m]
+>>> square lap 3 vertex 13 reached: estimate (-0.398, +1.476, -93.3 deg), 6 looks, tags [4, 5, 6, 7] 
+  look: 21 frames, tags [5@1.50m, 6@2.24m], rejected {7: 'only 1 frames'}
+  drive fwd   0.750 m   cmd 0.30  T 1.96 s
+  look: 20 frames, tags [6@1.42m, 7@1.84m]
+  drive fwd   0.555 m   cmd 0.30  T 1.46 s  !! T = 1.46 s outside calibrated 2-4 s
+  look: 9 frames, tags [6@0.82m]
+>>> square lap 3 vertex 14 NOT reached: estimate (-0.414, +0.067, -84.8 deg), 3 looks, tags [5, 6, 7] no calibrated level for Move(kind='spin', value=-0.455136753255605)
+  look: 8 frames, tags [6@0.82m]
+  spin  ccw  74.881 deg cmd 0.35  T 0.54 s
+  look: 18 frames, tags [0@2.27m, 7@1.44m]
+  spin  ccw   4.033 deg cmd 0.25  T 0.15 s
+  look: 27 frames, tags [0@2.28m, 1@2.58m, 7@1.44m]
+  drive fwd   0.335 m   cmd 0.30  T 0.91 s  !! T = 0.91 s outside calibrated 2-4 s
+  look: 20 frames, tags [0@1.91m, 7@1.10m]
+  spin  ccw   5.540 deg cmd 0.25  T 0.23 s
+  look: 20 frames, tags [0@1.91m, 1@2.31m]
+  drive fwd   0.061 m   cmd 0.30  T 0.21 s  !! T = 0.21 s outside calibrated 2-4 s
+  look: 18 frames, tags [0@1.86m, 1@2.27m]
+--- square lap 3 done: 8 landmarks
+   id       x       y     psi      sx     sy  spsi  upd
+    0  +1.831  +0.210  +177.2   0.161  0.063   3.1  22
+    2  +0.914  +2.418   -95.3   0.207  0.045   3.6  11
+    4  -1.282  +1.360    +2.0   0.173  0.134   3.4  16
+    6  -0.340  -0.745   +90.1   0.170  0.077   3.4  10
+    1  +1.882  +1.255  +177.1   0.173  0.065   3.5  13
+    3  -0.128  +2.508   -97.1   0.207  0.085   5.2  5
+    5  -1.331  +0.341    +0.2   0.163  0.130   3.7  10
+    7  +0.718  -0.787   +90.0   0.168  0.045   3.7  10
+>>> square lap 3 vertex 15 reached: estimate (-0.004, -0.016, -3.7 deg), 6 looks, tags [0, 1, 6, 7] 
+=== square done. Mark and measure the robot pose now (write it into /home/ubuntu/ros2_ws/src/CSE276A/HW3/logs/run_20261106_091125/octagon/start.yaml); reset: new map frame here
+octagon starts in 30...
+octagon starts in 29...
+octagon starts in 28...
+octagon starts in 27...
+octagon starts in 26...
+octagon starts in 25...
+octagon starts in 24...
+octagon starts in 23...
+octagon starts in 22...
+octagon starts in 21...
+octagon starts in 20...
+octagon starts in 19...
+octagon starts in 18...
+octagon starts in 17...
+octagon starts in 16...
+octagon starts in 15...
+octagon starts in 14...
+octagon starts in 13...
+octagon starts in 12...
+octagon starts in 11...
+octagon starts in 10...
+octagon starts in 9...
+octagon starts in 8...
+octagon starts in 7...
+octagon starts in 6...
+octagon starts in 5...
+octagon starts in 4...
+octagon starts in 3...
+octagon starts in 2...
+octagon starts in 1...
+=== phase octagon: 24 vertices, 3 laps; map frame = current pose; measure it into /home/ubuntu/ros2_ws/src/CSE276A/HW3/logs/run_20261106_091125/octagon/start.yaml
+  look: 18 frames, tags [0@1.86m, 1@2.27m]
+  drive fwd   0.523 m   cmd 0.30  T 1.38 s  !! T = 1.38 s outside calibrated 2-4 s
+  look: 9 frames, tags [0@1.28m]
+  spin  ccw  42.509 deg cmd 0.35  T 0.32 s
+  look: 20 frames, tags [0@1.29m, 1@1.86m]
+  spin  ccw   4.974 deg cmd 0.25  T 0.20 s
+  look: 18 frames, tags [0@1.29m, 1@1.86m]
+>>> octagon lap 1 vertex 1 reached: estimate (+0.575, +0.002, +40.7 deg), 4 looks, tags [0, 1] 
+  look: 18 frames, tags [0@1.29m, 1@1.85m]
+  drive fwd   0.556 m   cmd 0.30  T 1.46 s  !! T = 1.46 s outside calibrated 2-4 s
+  look: 10 frames, tags [1@1.23m]
+  spin  ccw  47.928 deg cmd 0.35  T 0.36 s
+  look: 27 frames, tags [1@1.24m, 2@2.08m, 3@2.47m]
+  spin  ccw   5.476 deg cmd 0.25  T 0.23 s
+  look: 20 frames, tags [2@2.08m, 3@2.49m]
+>>> octagon lap 1 vertex 2 reached: estimate (+1.046, +0.411, +93.3 deg), 4 looks, tags [0, 1, 2, 3] 
+  look: 20 frames, tags [2@2.08m, 3@2.49m]
+  spin  cw    4.662 deg cmd 0.25  T 0.10 s
+  look: 26 frames, tags [1@1.24m, 2@2.08m, 3@2.49m]
+  drive fwd   0.551 m   cmd 0.30  T 1.45 s  !! T = 1.45 s outside calibrated 2-4 s
+  look: 18 frames, tags [2@1.45m, 3@1.97m]
+  spin  ccw  44.062 deg cmd 0.35  T 0.33 s
+  look: 27 frames, tags [2@1.47m, 3@2.01m, 4@2.45m]
+>>> octagon lap 1 vertex 3 reached: estimate (+1.058, +1.035, +130.9 deg), 4 looks, tags [1, 2, 3] 
+  look: 27 frames, tags [2@1.47m, 3@2.01m, 4@2.45m]
+  drive fwd   0.541 m   cmd 0.30  T 1.43 s  !! T = 1.43 s outside calibrated 2-4 s
+  look: 9 frames, tags [3@1.39m]
+  spin  ccw  46.545 deg cmd 0.35  T 0.35 s
+  look: 18 frames, tags [4@2.03m, 5@2.33m]
+  spin  ccw   5.726 deg cmd 0.25  T 0.24 s
+  look: 18 frames, tags [4@2.03m, 5@2.34m]
+>>> octagon lap 1 vertex 4 reached: estimate (+0.666, +1.479, -179.2 deg), 4 looks, tags [2, 3, 4, 5] 
+  look: 18 frames, tags [4@2.03m, 5@2.34m]
+  drive fwd   0.567 m   cmd 0.30  T 1.49 s  !! T = 1.49 s outside calibrated 2-4 s
+  look: 16 frames, tags [4@1.41m, 5@1.77m]
+  spin  cw   38.402 deg cmd 0.35  T 0.23 s  !! adjusted T = 0.23 s outside calibrated 0.4-1.6 s
+  look: 9 frames, tags [4@1.41m]
+  spin  ccw  62.164 deg cmd 0.35  T 0.45 s
+  look: 18 frames, tags [5@1.78m, 6@2.15m]
+  spin  ccw   5.506 deg cmd 0.25  T 0.23 s
+  look: 18 frames, tags [5@1.79m, 6@2.16m]
+>>> octagon lap 1 vertex 5 reached: estimate (+0.033, +1.465, -134.3 deg), 5 looks, tags [4, 5, 6] 
+  look: 18 frames, tags [5@1.79m, 6@2.16m]
+  spin  cw    5.237 deg cmd 0.25  T 0.12 s
+  look: 20 frames, tags [5@1.78m, 6@2.15m]
+  drive fwd   0.523 m   cmd 0.30  T 1.38 s  !! T = 1.38 s outside calibrated 2-4 s
+  look: 10 frames, tags [5@1.21m]
+  spin  ccw  46.281 deg cmd 0.35  T 0.35 s
+  look: 20 frames, tags [6@1.69m, 7@2.01m]
+  spin  ccw   6.597 deg cmd 0.25  T 0.29 s
+  look: 20 frames, tags [6@1.70m, 7@2.03m]
+>>> octagon lap 1 vertex 6 reached: estimate (-0.396, +1.071, -89.1 deg), 5 looks, tags [5, 6, 7] 
+  look: 16 frames, tags [6@1.70m, 7@2.03m]
+  spin  cw    4.929 deg cmd 0.25  T 0.11 s
+  look: 9 frames, tags [6@1.70m]
+  drive fwd   0.536 m   cmd 0.30  T 1.42 s  !! T = 1.42 s outside calibrated 2-4 s
+  look: 20 frames, tags [6@1.13m, 7@1.54m]
+  spin  cw    5.240 deg cmd 0.25  T 0.12 s
+  look: 18 frames, tags [6@1.13m, 7@1.53m]
+  drive fwd   0.072 m   cmd 0.30  T 0.24 s  !! T = 0.24 s outside calibrated 2-4 s
+  look: 10 frames, tags [6@1.05m]
+  spin  ccw  50.029 deg cmd 0.35  T 0.37 s
+  look: 20 frames, tags [6@1.05m, 7@1.49m]
+  spin  ccw   5.091 deg cmd 0.25  T 0.21 s
+  look: 10 frames, tags [7@1.49m]
+  spin  ccw   3.685 deg cmd 0.25  T 0.13 s
+  look: 10 frames, tags [7@1.49m]
+>>> octagon lap 1 vertex 7 reached: estimate (-0.427, +0.413, -49.6 deg), 8 looks, tags [6, 7] 
+  look: 10 frames, tags [7@1.49m]
+  spin  ccw   5.441 deg cmd 0.25  T 0.23 s
+  look: 18 frames, tags [0@2.13m, 7@1.49m]
+  spin  cw    5.056 deg cmd 0.25  T 0.11 s
+  look: 20 frames, tags [0@2.11m, 7@1.49m]
+  spin  cw    6.205 deg cmd 0.25  T 0.15 s
+  look: 18 frames, tags [0@2.09m, 7@1.49m]
+--- octagon lap 1 done: 8 landmarks
+   id       x       y     psi      sx     sy  spsi  upd
+    0  +1.812  +0.341  -179.4   0.033  0.028   1.8  7
+    1  +1.813  +1.397  -179.4   0.038  0.031   3.2  6
+    2  +0.750  +2.484   -90.9   0.066  0.032   2.4  6
+    3  -0.285  +2.513   -92.9   0.068  0.052   3.8  7
+    4  -1.338  +1.450    +1.8   0.048  0.087   2.6  6
+    5  -1.393  +0.416    +0.1   0.042  0.090   2.8  8
+    6  -0.336  -0.659   +90.2   0.059  0.063   2.2  11
+    7  +0.717  -0.693   +89.4   0.062  0.039   3.0  11
+>>> octagon lap 1 vertex 8 reached: estimate (-0.313, +0.385, -41.8 deg), 4 looks, tags [0, 7] remaining spin is below the smallest step
+  look: 20 frames, tags [0@2.09m, 7@1.49m]
+  spin  ccw   6.369 deg cmd 0.25  T 0.28 s
+  look: 20 frames, tags [0@2.14m, 7@1.49m]
+  spin  ccw   6.370 deg cmd 0.25  T 0.28 s
+  look: 18 frames, tags [0@2.15m, 7@1.49m]
+  drive fwd   0.750 m   cmd 0.30  T 1.96 s
+  look: 9 frames, tags [0@1.37m]
+  spin  cw    5.468 deg cmd 0.25  T 0.13 s
+  look: 9 frames, tags [0@1.37m]
+  drive fwd   0.176 m   cmd 0.30  T 0.51 s  !! T = 0.51 s outside calibrated 2-4 s
+  look: 9 frames, tags [0@1.20m]
+  spin  ccw  61.332 deg cmd 0.35  T 0.45 s
+  look: 18 frames, tags [0@1.22m, 1@1.81m]
+  spin  ccw   4.773 deg cmd 0.25  T 0.19 s
+  look: 18 frames, tags [0@1.22m, 1@1.81m]
+>>> octagon lap 2 vertex 9 reached: estimate (+0.647, +0.021, +43.3 deg), 8 looks, tags [0, 1, 7] 
+  look: 18 frames, tags [0@1.22m, 1@1.80m]
+  drive fwd   0.492 m   cmd 0.30  T 1.30 s  !! T = 1.30 s outside calibrated 2-4 s
+  look: 10 frames, tags [1@1.25m]
+  spin  ccw  44.266 deg cmd 0.35  T 0.33 s
+  look: 9 frames, tags [1@1.26m]
+  spin  ccw   5.075 deg cmd 0.25  T 0.21 s
+  look: 30 frames, tags [1@1.25m, 2@2.10m, 3@2.50m]
+>>> octagon lap 2 vertex 10 reached: estimate (+1.058, +0.402, +89.8 deg), 4 looks, tags [0, 1, 2, 3] 
+  look: 27 frames, tags [1@1.25m, 2@2.10m, 3@2.51m]
+  drive fwd   0.562 m   cmd 0.30  T 1.48 s  !! T = 1.48 s outside calibrated 2-4 s
+  look: 9 frames, tags [3@1.98m]
+  spin  ccw  42.492 deg cmd 0.35  T 0.32 s
+  look: 27 frames, tags [2@1.47m, 3@2.00m, 4@2.45m]
+>>> octagon lap 2 vertex 11 reached: estimate (+1.062, +1.034, +135.3 deg), 3 looks, tags [1, 2, 3, 4] 
+  look: 30 frames, tags [2@1.47m, 3@2.00m, 4@2.45m]
+  drive fwd   0.542 m   cmd 0.30  T 1.43 s  !! T = 1.43 s outside calibrated 2-4 s
+  look: 9 frames, tags [3@1.39m]
+  spin  ccw  42.359 deg cmd 0.35  T 0.32 s
+  look: 30 frames, tags [3@1.39m, 4@2.00m, 5@2.29m]
+  spin  ccw   4.852 deg cmd 0.25  T 0.20 s
+  look: 20 frames, tags [4@2.00m, 5@2.30m]
+>>> octagon lap 2 vertex 12 reached: estimate (+0.634, +1.466, +176.2 deg), 4 looks, tags [2, 3, 4, 5] 
+  look: 18 frames, tags [4@2.00m, 5@2.30m]
+  drive fwd   0.537 m   cmd 0.30  T 1.42 s  !! T = 1.42 s outside calibrated 2-4 s
+  look: 20 frames, tags [4@1.39m, 5@1.79m]
+  spin  ccw  44.810 deg cmd 0.35  T 0.34 s
+  look: 27 frames, tags [4@1.39m, 5@1.81m, 6@2.21m]
+>>> octagon lap 2 vertex 13 reached: estimate (+0.037, +1.506, -137.5 deg), 3 looks, tags [4, 5, 6] 
+  look: 30 frames, tags [4@1.39m, 5@1.81m, 6@2.21m]
+  drive fwd   0.554 m   cmd 0.30  T 1.46 s  !! T = 1.46 s outside calibrated 2-4 s
+  look: 9 frames, tags [5@1.18m]
+  spin  ccw  45.553 deg cmd 0.35  T 0.34 s
+  look: 16 frames, tags [6@1.78m, 7@2.13m]
+>>> octagon lap 2 vertex 14 reached: estimate (-0.429, +1.084, -92.7 deg), 3 looks, tags [4, 5, 6, 7] 
+  look: 18 frames, tags [6@1.78m, 7@2.13m]
+  drive fwd   0.548 m   cmd 0.30  T 1.44 s  !! T = 1.44 s outside calibrated 2-4 s
+  look: 10 frames, tags [6@1.18m]
+  spin  ccw  44.909 deg cmd 0.35  T 0.34 s
+  look: 20 frames, tags [6@1.18m, 7@1.69m]
+>>> octagon lap 2 vertex 15 NOT reached: estimate (-0.453, +0.494, -47.5 deg), 3 looks, tags [6, 7] no calibrated level for Move(kind='spin', value=-0.4898341789378612)
+  look: 20 frames, tags [6@1.18m, 7@1.69m]
+  drive fwd   0.572 m   cmd 0.30  T 1.51 s  !! T = 1.51 s outside calibrated 2-4 s
+  look: 9 frames, tags [7@1.03m]
+  spin  ccw  42.521 deg cmd 0.35  T 0.32 s
+  look: 18 frames, tags [0@1.85m, 7@1.04m]
+  spin  ccw   4.752 deg cmd 0.25  T 0.19 s
+  look: 14 frames, tags [0@1.86m, 7@1.05m]
+  spin  ccw   5.032 deg cmd 0.25  T 0.21 s
+  look: 16 frames, tags [0@1.86m, 1@2.28m]
+--- octagon lap 2 done: 8 landmarks
+   id       x       y     psi      sx     sy  spsi  upd
+    0  +1.815  +0.348  -179.7   0.032  0.027   1.5  19
+    1  +1.805  +1.404  -179.0   0.037  0.028   2.4  14
+    2  +0.716  +2.475   -89.6   0.058  0.027   2.0  10
+    3  -0.319  +2.480   -91.5   0.059  0.044   2.8  14
+    4  -1.356  +1.396    +2.5   0.041  0.069   1.9  14
+    5  -1.390  +0.378    +0.9   0.037  0.071   2.2  15
+    6  -0.319  -0.688   +90.8   0.049  0.047   1.8  18
+    7  +0.735  -0.704   +90.6   0.050  0.028   2.2  21
+>>> octagon lap 2 vertex 16 reached: estimate (-0.011, +0.011, -1.2 deg), 5 looks, tags [0, 1, 6, 7] 
+  look: 18 frames, tags [0@1.86m, 1@2.28m]
+  drive fwd   0.533 m   cmd 0.30  T 1.41 s  !! T = 1.41 s outside calibrated 2-4 s
+  look: 10 frames, tags [0@1.27m]
+  spin  ccw  43.629 deg cmd 0.35  T 0.33 s
+  look: 20 frames, tags [0@1.29m, 1@1.87m]
+  spin  ccw   5.216 deg cmd 0.25  T 0.22 s
+  look: 20 frames, tags [0@1.29m, 1@1.87m]
+>>> octagon lap 3 vertex 17 reached: estimate (+0.584, -0.011, +45.3 deg), 4 looks, tags [0, 1] 
+  look: 20 frames, tags [0@1.29m, 1@1.87m], rejected {2: 'only 2 frames'}
+  drive fwd   0.558 m   cmd 0.30  T 1.47 s  !! T = 1.47 s outside calibrated 2-4 s
+  look: 9 frames, tags [1@1.23m]
+  spin  ccw  42.520 deg cmd 0.35  T 0.32 s
+  look: 18 frames, tags [1@1.24m, 3@2.47m]
+>>> octagon lap 3 vertex 18 reached: estimate (+1.036, +0.436, +91.2 deg), 3 looks, tags [0, 1, 3] 
+  look: 20 frames, tags [1@1.24m, 3@2.47m]
+  drive fwd   0.529 m   cmd 0.30  T 1.40 s  !! T = 1.40 s outside calibrated 2-4 s
+  look: 18 frames, tags [2@1.47m, 3@1.97m]
+  spin  ccw  40.315 deg cmd 0.35  T 0.31 s  !! adjusted T = 0.31 s outside calibrated 0.4-1.6 s
+  look: 30 frames, tags [2@1.48m, 3@1.99m, 4@2.40m]
+>>> octagon lap 3 vertex 19 reached: estimate (+1.026, +1.026, +130.7 deg), 3 looks, tags [1, 2, 3, 4] 
+  look: 27 frames, tags [2@1.48m, 3@1.99m, 4@2.40m]
+  drive fwd   0.527 m   cmd 0.30  T 1.39 s  !! T = 1.39 s outside calibrated 2-4 s
+  look: 10 frames, tags [3@1.38m]
+  spin  ccw  47.155 deg cmd 0.35  T 0.35 s
+  look: 30 frames, tags [3@1.39m, 4@2.02m, 5@2.31m]
+  spin  ccw   3.622 deg cmd 0.25  T 0.13 s
+  look: 20 frames, tags [4@2.01m, 5@2.32m]
+>>> octagon lap 3 vertex 20 reached: estimate (+0.642, +1.479, +177.3 deg), 4 looks, tags [2, 3, 4, 5] 
+  look: 20 frames, tags [4@2.01m, 5@2.32m]
+  drive fwd   0.544 m   cmd 0.30  T 1.44 s  !! T = 1.44 s outside calibrated 2-4 s
+  look: 16 frames, tags [4@1.40m, 5@1.80m]
+  spin  ccw  44.030 deg cmd 0.35  T 0.33 s
+  look: 16 frames, tags [4@1.41m, 5@1.82m]
+  spin  ccw   5.267 deg cmd 0.25  T 0.22 s
+  look: 27 frames, tags [4@1.40m, 5@1.82m, 6@2.21m]
+>>> octagon lap 3 vertex 21 reached: estimate (+0.030, +1.505, -138.4 deg), 4 looks, tags [4, 5, 6] 
+  look: 30 frames, tags [4@1.40m, 5@1.82m, 6@2.21m]
+  drive fwd   0.548 m   cmd 0.30  T 1.44 s  !! T = 1.44 s outside calibrated 2-4 s
+  look: 10 frames, tags [5@1.18m]
+  spin  ccw  47.303 deg cmd 0.35  T 0.35 s
+  look: 18 frames, tags [6@1.80m, 7@2.15m]
+>>> octagon lap 3 vertex 22 reached: estimate (-0.449, +1.082, -90.4 deg), 3 looks, tags [4, 5, 6, 7] 
+  look: 18 frames, tags [6@1.80m, 7@2.15m]
+  drive fwd   0.545 m   cmd 0.30  T 1.44 s  !! T = 1.44 s outside calibrated 2-4 s
+  look: 2 frames, tags [], rejected {6: 'only 2 frames'}
+  drive fwd   0.099 m   cmd 0.30  T 0.31 s  !! T = 0.31 s outside calibrated 2-4 s
+  look: 7 frames, tags [6@1.11m]
+  spin  ccw  44.093 deg cmd 0.35  T 0.33 s
+  look: 10 frames, tags [6@1.12m, 7@1.64m]
+>>> octagon lap 3 vertex 23 reached: estimate (-0.450, +0.408, -47.2 deg), 4 looks, tags [6, 7] 
+  look: 4 frames, tags [], rejected {6: 'only 2 frames', 7: 'only 2 frames'}
+  spin  ccw   4.973 deg cmd 0.25  T 0.20 s
+  look: 14 frames, tags [0@2.24m, 7@1.64m]
+  drive fwd   0.508 m   cmd 0.30  T 1.34 s  !! T = 1.34 s outside calibrated 2-4 s
+  look: 2 frames, tags [], rejected {7: 'only 2 frames'}
+  drive fwd   0.098 m   cmd 0.30  T 0.31 s  !! T = 0.31 s outside calibrated 2-4 s
+  look: 3 frames, tags [7@0.94m]
+  spin  ccw  36.605 deg cmd 0.35  T 0.28 s  !! adjusted T = 0.28 s outside calibrated 0.4-1.6 s
+  look: 12 frames, tags [0@1.78m, 7@0.95m]
+  spin  ccw   4.205 deg cmd 0.25  T 0.16 s
+  look: 1 frames, tags [], rejected {0: 'only 1 frames'}
+--- octagon lap 3 done: 8 landmarks
+   id       x       y     psi      sx     sy  spsi  upd
+    0  +1.818  +0.355  -179.3   0.032  0.026   1.5  26
+    1  +1.798  +1.410  -178.5   0.036  0.027   2.1  21
+    2  +0.693  +2.471   -88.7   0.055  0.026   1.8  13
+    3  -0.340  +2.460   -90.8   0.056  0.042   2.4  21
+    4  -1.363  +1.366    +3.2   0.039  0.064   1.7  23
+    5  -1.384  +0.352    +1.5   0.036  0.065   1.9  23
+    6  -0.306  -0.704   +91.1   0.047  0.042   1.6  24
+    7  +0.750  -0.710   +91.3   0.048  0.025   2.0  27
+>>> octagon lap 3 vertex 24 reached: estimate (+0.092, -0.043, -4.2 deg), 6 looks, tags [0, 7] 

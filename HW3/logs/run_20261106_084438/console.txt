@@ -1,0 +1,41 @@
+log: /home/ubuntu/ros2_ws/src/CSE276A/HW3/logs/run_20261106_084438
+starting in 3...
+starting in 2...
+starting in 1...
+=== phase square: 15 vertices, 3 laps; map frame = current pose; measure it into /home/ubuntu/ros2_ws/src/CSE276A/HW3/logs/run_20261106_084438/square/start.yaml
+  look: 20 frames, tags [0@1.97m, 1@2.35m]
+  drive fwd   0.750 m   cmd 0.30  T 1.96 s
+  look: 10 frames, tags [0@1.11m]
+  drive fwd   0.203 m   cmd 0.30  T 0.57 s  !! T = 0.57 s outside calibrated 2-4 s
+  look: 9 frames, tags [0@0.90m]
+  spin  ccw  86.856 deg cmd 0.35  T 0.62 s
+  look: 22 frames, tags [1@1.58m, 3@2.72m], rejected {2: 'only 2 frames'}
+>>> square lap 1 vertex 1 reached: estimate (+1.066, +0.012, +86.3 deg), 4 looks, tags [0, 1] 
+  look: 22 frames, tags [1@1.58m, 3@2.71m], rejected {2: 'only 2 frames'}
+  spin  ccw   3.861 deg cmd 0.25  T 0.14 s
+  look: 20 frames, tags [1@1.58m, 3@2.72m]
+  drive fwd   0.750 m   cmd 0.30  T 1.96 s
+  look: 10 frames, tags [3@1.93m]
+  drive fwd   0.635 m   cmd 0.30  T 1.67 s
+  look: 9 frames, tags [2@0.85m]
+  spin  cw    8.003 deg cmd 0.25  T 0.20 s
+  look: 8 frames, tags [2@0.85m]
+  drive fwd   0.108 m   cmd 0.30  T 0.34 s  !! T = 0.34 s outside calibrated 2-4 s
+  look: 9 frames, tags [2@0.72m]
+  spin  ccw  98.016 deg cmd 0.35  T 0.69 s
+  look: 18 frames, tags [4@2.08m, 5@2.49m]
+>>> square lap 1 vertex 2 reached: estimate (+1.037, +1.523, +180.0 deg), 7 looks, tags [1, 2] 
+  look: 18 frames, tags [4@2.08m, 5@2.49m]
+  drive fwd   0.750 m   cmd 0.30  T 1.96 s
+  look: 18 frames, tags [4@1.22m, 5@1.77m]
+  drive fwd   0.526 m   cmd 0.30  T 1.39 s  !! T = 1.39 s outside calibrated 2-4 s
+  look: 9 frames, tags [4@0.64m]
+  spin  ccw  81.630 deg cmd 0.35  T 0.58 s
+  look: 25 frames, tags [6@2.34m, 7@2.71m], rejected {5: 'out of range (d 1.38 m, oblique 61 deg)'}
+  drive fwd   0.199 m   cmd 0.30  T 0.56 s  !! T = 0.56 s outside calibrated 2-4 s
+  look: 22 frames, tags [6@2.13m, 7@2.54m], rejected {5: 'only 2 frames'}
+  spin  ccw  10.743 deg cmd 0.25  T 0.51 s
+  look: 18 frames, tags [6@2.13m, 7@2.58m]
+>>> square lap 1 vertex 3 reached: estimate (-0.439, +1.499, -90.0 deg), 6 looks, tags [4, 5, 6] 
+  look: 20 frames, tags [6@2.13m, 7@2.58m]
+HALT: two looks in a row with every known tag rejected by the gate

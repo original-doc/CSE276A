@@ -111,6 +111,32 @@ def best_fit_rigid(est_xy, truth_xy):
     return R, t, np.linalg.norm(P @ R.T + t - Q, axis=1)
 
 
+def best_fit_similarity(est_xy, truth_xy):
+    """Like best_fit_rigid but with a uniform scale: truth ~ s R est + t.
+
+    Returns (s, R, t, residuals). s != 1 means the whole map is scaled
+    (e.g. a wrong tag size makes every distance too long by the same factor).
+    """
+    P, Q = np.asarray(est_xy, dtype=float), np.asarray(truth_xy, dtype=float)
+    p0, q0 = P.mean(axis=0), Q.mean(axis=0)
+    U, S, Vt = np.linalg.svd((P - p0).T @ (Q - q0))
+    D = np.diag([1.0, np.sign(np.linalg.det(Vt.T @ U.T))])
+    R = Vt.T @ D @ U.T
+    s = float((S * np.diag(D)).sum() / ((P - p0) ** 2).sum())
+    t = q0 - s * R @ p0
+    return s, R, t, np.linalg.norm(s * P @ R.T + t - Q, axis=1)
+
+
+def similarity_errors(est, truth):
+    """Scale + rigid fit on common ids -> (scale, mean residual m). Needs >= 3 landmarks."""
+    common = sorted(set(est) & set(truth))
+    if len(common) < 3:
+        return None, None
+    s, _, _, res = best_fit_similarity([(est[i].x, est[i].y) for i in common],
+                                       [(truth[i].x, truth[i].y) for i in common])
+    return s, float(res.mean())
+
+
 def rigid_to_pose(R, t):
     return Pose2(float(t[0]), float(t[1]), math.atan2(R[1, 0], R[0, 0]))
 

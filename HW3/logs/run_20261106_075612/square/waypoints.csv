@@ -1,0 +1,4 @@
+t,wp,lap,goal_x,goal_y,goal_theta_deg,reached,tag_based,x,y,theta_deg,sx,sy,stheta_deg,iters,tags,note
+12.67,1,1,1.0607,0.0000,90.00,0,1,1.0772,0.0162,69.57,0.0499,0.0223,1.93,5,0 1,"no calibrated level for Move(kind='spin', value=0.35660988904870927)"
+14.69,2,1,1.0607,1.5000,180.00,0,0,1.0772,0.0162,69.57,0.0499,0.0223,1.93,1,,"no calibrated level for Move(kind='spin', value=0.36773287096043994)"
+36.53,3,1,-0.4393,1.5000,-90.00,1,1,-0.4393,1.5000,-90.00,0.1765,0.1732,10.62,7,1 2 3,

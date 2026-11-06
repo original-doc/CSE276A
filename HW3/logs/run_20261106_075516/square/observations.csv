@@ -1,0 +1,26 @@
+t,wp,lap,id,x,y,psi_deg,dist,oblique_deg,count,action,accepted,d2,reason
+1.01,1,1,3,2.4317,-0.3035,176.89,2.451,4.0,10,init,1,0.00,
+1.01,1,1,2,2.4397,-1.3415,-179.36,2.784,29.4,10,skip_init,0,0.00,dist 2.78 > 2.50 m
+5.08,1,1,3,1.5152,-0.4418,173.48,1.578,9.7,10,update,1,5.17,
+7.86,1,1,3,1.2413,-0.4758,172.11,1.329,13.1,10,update,1,3.33,
+10.63,1,1,4,0.6611,-0.3682,168.61,0.757,17.7,10,init,1,0.00,
+10.63,1,1,5,0.8582,0.6278,169.55,1.063,46.6,10,skip_init,0,0.00,oblique 47 > 45 deg
+12.65,2,1,4,0.6611,-0.3682,168.59,0.757,17.7,10,update,1,0.00,
+12.65,2,1,5,0.8582,0.6277,169.54,1.063,46.6,10,skip_init,0,0.00,oblique 47 > 45 deg
+23.40,2,1,,,,,,,,rejected,0,0.00,"tag 7: out of range (d 1.51 m, oblique 62 deg)"
+23.40,2,1,,,,,,,,rejected,0,0.00,tag 0: unstable (std 0.076 m)
+23.40,2,1,,,,,,,,rejected,0,0.00,tag 1: unstable (std 0.076 m)
+25.88,2,1,,,,,,,,rejected,0,0.00,"tag 7: out of range (d 1.53 m, oblique 61 deg)"
+25.88,2,1,0,2.3932,0.5274,-176.80,2.451,9.2,9,init,1,0.00,
+25.88,2,1,1,2.3264,1.5544,-176.43,2.798,30.2,9,skip_init,0,0.00,dist 2.80 > 2.50 m
+28.37,2,1,,,,,,,,rejected,0,0.00,"tag 7: out of range (d 1.54 m, oblique 61 deg)"
+28.37,2,1,,,,,,,,rejected,0,0.00,tag 0: unstable (std 0.157 m)
+28.37,2,1,,,,,,,,rejected,0,0.00,tag 1: unstable (std 0.139 m)
+30.72,2,1,,,,,,,,rejected,0,0.00,tag 7: only 1 frames
+30.72,2,1,,,,,,,,rejected,0,0.00,tag 0: unstable (std 0.031 m)
+30.72,2,1,,,,,,,,rejected,0,0.00,tag 1: only 2 frames
+32.75,3,1,,,,,,,,rejected,0,0.00,tag 1: only 2 frames
+32.75,3,1,0,2.3430,0.9269,-169.32,2.520,10.9,9,gate,0,643.03,gate
+40.66,3,1,,,,,,,,rejected,0,0.00,tag 0: only 2 frames
+40.66,3,1,,,,,,,,rejected,0,0.00,tag 1: only 2 frames
+40.66,3,1,,,,,,,,rejected,0,0.00,tag 7: only 2 frames

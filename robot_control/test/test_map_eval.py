@@ -6,8 +6,9 @@ import yaml
 from sim_hw3 import arena_map
 
 from robot_control.map_eval import (
-    align, best_fit_rigid, cov_ellipse, cov_to_arena, landmark_errors, load_start, mean_error,
-    poses_to_arena, rigid_to_pose, snapshot_poses, to_arena, truth_poses,
+    align, best_fit_rigid, best_fit_similarity, cov_ellipse, cov_to_arena, landmark_errors,
+    load_start, mean_error, poses_to_arena, rigid_to_pose, similarity_errors, snapshot_poses,
+    to_arena, truth_poses,
 )
 from robot_control.se2 import Pose2, compose, inverse, wrap_angle
 
@@ -130,3 +131,18 @@ def test_cov_ellipse_axes_and_angle():
     a, b, ang = cov_ellipse(R @ np.diag([0.09, 0.01]) @ R.T, k=1.0)
     assert (a, b) == pytest.approx((0.3, 0.1))
     assert math.tan(ang) == pytest.approx(math.tan(0.5))
+
+
+def test_similarity_fit_recovers_scale():
+    rng = np.random.default_rng(3)
+    est = rng.uniform(-2, 2, size=(8, 2))
+    th = 0.4
+    R_true = np.array([[math.cos(th), -math.sin(th)], [math.sin(th), math.cos(th)]])
+    truth = 0.94 * est @ R_true.T + [1.0, -0.5]
+    s, R, t, res = best_fit_similarity(est, truth)
+    assert s == pytest.approx(0.94) and np.allclose(R, R_true) and res.max() < 1e-12
+    e = {i: Pose2(x, y, 0.0) for i, (x, y) in enumerate(est)}
+    tr = {i: Pose2(x, y, 0.0) for i, (x, y) in enumerate(truth)}
+    scale, mean_res = similarity_errors(e, tr)
+    assert scale == pytest.approx(0.94) and mean_res < 1e-12
+    assert similarity_errors({0: e[0], 1: e[1]}, tr) == (None, None)
