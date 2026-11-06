@@ -1,7 +1,7 @@
 import pytest
 
 from robot_control.ol_model import (
-    Calibration, ModelError, fit_for, fit_line, invert, wrap_deg,
+    Calibration, ModelError, PulseModel, fit_for, fit_line, invert, pulse_from_yaml, wrap_deg,
 )
 
 
@@ -96,3 +96,32 @@ def test_wrap_deg():
     assert wrap_deg(190) == -170
     assert wrap_deg(-180) == 180
     assert wrap_deg(540) == 180
+
+
+def test_pulse_model():
+    pm = PulseModel(179.6, -18.6, 0.15, 0.22, 0.58, 2.3, 6)
+    assert pm.min_deg == pytest.approx(179.6 * 0.15 - 18.6)
+    T, warn = pm.time(30.0)
+    assert T == pytest.approx((30.0 + 18.6) / 179.6) and warn is None
+    _, warn = pm.time(10.0)                 # 0.16 s < 0.22 s - 20 %
+    assert 'outside fitted' in warn
+    with pytest.raises(ModelError):
+        pm.time(5.0)                        # below min_T
+    with pytest.raises(ModelError):
+        PulseModel(0.0, 0.0, 0.1, 0.1, 1.0).time(10.0)
+    assert pulse_from_yaml(pm.to_yaml()) == pm
+
+
+def test_spin_time_prefers_the_pulse_model_and_roundtrips(tmp_path):
+    c = make_calib(tmp_path)
+    c.data['spin']['ccw']['time_scale'] = 1.15
+    c.set_pulse('ccw', 0.35, PulseModel(136.9, -6.3, 0.1, 0.25, 0.86, 4.4, 49))
+    T, warn = c.spin_time('ccw', 90.0, 0.35)
+    assert T == pytest.approx((90.0 + 6.3) / 136.9) and warn is None     # no time_scale
+    with pytest.raises(ModelError):
+        c.spin_time('ccw', 5.0, 0.35)
+    assert c.pulse('ccw', 0.25) is None and c.pulse('cw', 0.35) is None
+    c.save()
+    d = Calibration.load(tmp_path / 'wood.yaml')
+    assert d.pulse('ccw', 0.35) == c.pulse('ccw', 0.35)
+    assert d.spin_time('ccw', 90.0, 0.35)[0] == pytest.approx(T)

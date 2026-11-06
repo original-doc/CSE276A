@@ -4,6 +4,12 @@ Per command level c, a primitive run for T seconds moves
     drive: d(T) = v * T + d0      (m)
     spin:  a(T) = w * T + a0      (deg, per direction)
 Fits are always recomputed from the raw trials in config/open_loop/<floor>.yaml.
+
+A spin level may instead carry a `pulse` model (spin: <dir>: pulse: {<cmd>: {...}}):
+the same line a = rate * T + offset, but on the COMMANDED T, fitted from the heading
+corrections of closed-loop runs (HW3/fit_spin_pulse.py) and valid down to `min_T`.
+It replaces the trial fit and `time_scale` for that level, so one coarse level covers
+every turn from a few degrees up (no gap between a fine and a coarse level).
 """
 import math
 import os
@@ -53,6 +59,49 @@ def fit_line(points):
         offset = mv - rate * mt
     rms = math.sqrt(sum((v - (rate * t + offset)) ** 2 for t, v in points) / n)
     return LineFit(rate, offset, rms, n, distinct, min(Ts), max(Ts))
+
+
+@dataclass
+class PulseModel:
+    """Single pulses of one spin level: deg = rate * T + offset on the commanded T."""
+    rate: float             # deg/s
+    offset: float           # deg; negative = dead time before the robot starts turning
+    min_T: float            # s, shortest pulse allowed
+    t_min: float            # s, range of the fitted data
+    t_max: float
+    rms: float = 0.0        # deg, residual of the fit
+    n: int = 0              # samples fitted
+
+    def at(self, T):
+        return self.rate * T + self.offset
+
+    @property
+    def min_deg(self):
+        """Smallest turn this level can make (one pulse of min_T)."""
+        return self.at(self.min_T)
+
+    def time(self, deg):
+        """Pulse length for `deg`; raises ModelError below min_T. Returns (T, warning)."""
+        if self.rate <= 0:
+            raise ModelError(f'non-positive pulse rate {self.rate:.3f}')
+        T = (deg - self.offset) / self.rate
+        if T < self.min_T:
+            raise ModelError(f'pulse T = {T:.2f} s < {self.min_T} s for {deg:g} deg '
+                             f'(smallest {self.min_deg:.1f} deg)')
+        warn = None
+        if T < self.t_min * (1 - EXTRAP) or T > self.t_max * (1 + EXTRAP):
+            warn = f'pulse T = {T:.2f} s outside fitted {self.t_min:g}-{self.t_max:g} s'
+        return T, warn
+
+    def to_yaml(self):
+        """Plain python numbers (yaml.safe_dump cannot write numpy floats)."""
+        return {k: (round(float(v), 4) if k != 'n' else int(v)) for k, v in asdict(self).items()}
+
+
+def pulse_from_yaml(d):
+    return PulseModel(float(d['rate']), float(d['offset']), float(d['min_T']),
+                      float(d['t_min']), float(d['t_max']), float(d.get('rms', 0.0)),
+                      int(d.get('n', 0)))
 
 
 def fit_for(fits, cmd):
@@ -172,7 +221,21 @@ class Calibration:
     def drive_time(self, dist, cmd):
         return invert(fit_for(self.drive_fits(), cmd), dist, self.min_T(self.data['drive'], cmd))
 
+    def pulse(self, d, cmd):
+        """PulseModel of spin level cmd in direction d, or None if the file has none."""
+        for k, v in (self.data['spin'][d].get('pulse') or {}).items():
+            if abs(float(k) - cmd) < 1e-9:
+                return pulse_from_yaml(v)
+        return None
+
+    def set_pulse(self, d, cmd, model):
+        self.data['spin'][d].setdefault('pulse', {})[cmd] = model.to_yaml()
+
     def spin_time(self, d, deg, cmd):
+        """(T, warning) for one spin; the pulse model wins when the level has one."""
+        pm = self.pulse(d, cmd)
+        if pm is not None:
+            return pm.time(deg)
         fit = fit_for(self.spin_fits(d), cmd)
         min_T = self.min_T(self.data['spin'][d], cmd)
         T, warn = invert(fit, deg, min_T)
