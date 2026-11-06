@@ -138,7 +138,7 @@ class CsvNavLog(NavLog):
     # ---------- NavLog hooks ----------
 
     def on_look(self, goal_index, records, estimator):
-        t = self.now()
+        t = self.last_look_t = self.now()
         for r in records:
             o = r.obs
             cells = (['', '', '', '', '', '', ''] if o is None else
@@ -201,7 +201,7 @@ class SlamCsvLog(CsvNavLog):
         lap = self.lap(goal_index)
         self.records.setdefault(lap, []).extend(records)
         self.looks[lap] += 1
-        self.write_landmarks(self.now(), lap, estimator.snapshot())
+        self.write_landmarks(self.last_look_t, lap, estimator.snapshot())
         self.flush()
 
     def write_landmarks(self, t, lap, snap):
