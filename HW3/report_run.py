@@ -42,7 +42,6 @@ PHASES = ('square', 'octagon')
 SERIES = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#008300', '#6250d6',
           '#e34948']
 INK, MUTED, GRID = '#1f1f1e', '#8a8984', '#e4e3df'
-TRAJ, EST = SERIES[0], SERIES[1]
 SEEN = ('update', 'gate', 'init', 'skip_init')
 
 
@@ -307,6 +306,29 @@ def style(ax):
     ax.tick_params(colors=MUTED, labelcolor=INK)
 
 
+LAP_COLORS = ['#9ecae1', '#4292c6', '#08306b']      # light -> dark blue, lap 1 -> 3
+
+
+def lap_color(lap, n_laps):
+    """Colour of lap `lap` (1-based) when there are n_laps laps."""
+    if n_laps <= 1:
+        return LAP_COLORS[-1]
+    return LAP_COLORS[round((lap - 1) * (len(LAP_COLORS) - 1) / (n_laps - 1))]
+
+
+def lap_of_rows(phase):
+    """Lap (1-based) of every trajectory row, from the lap end times in waypoints.csv."""
+    ends = {}
+    for w in phase['wps']:
+        ends[int(w['lap'])] = float(w['t'])
+    bounds = sorted(ends.items())
+    laps = []
+    for r in phase['traj']:
+        t = float(r['t'])
+        laps.append(next((lap for lap, t_end in bounds if t <= t_end), bounds[-1][0]))
+    return laps
+
+
 def plot_map(phase, truth, out_path):
     T, how = placement(phase, truth)
     fig, ax = plt.subplots(figsize=(7, 7))
@@ -315,40 +337,53 @@ def plot_map(phase, truth, out_path):
     traj = [map_eval.to_arena(T, Pose2(float(r['x']), float(r['y']),
                                        math.radians(float(r['theta_deg']))))
             for r in phase['traj']]
-    ax.plot([p.x for p in traj], [p.y for p in traj], '-', color=TRAJ, lw=2,
-            label='estimated trajectory')
+    laps = lap_of_rows(phase)
+    n_laps = max(laps)
+    # One colour per lap; each segment starts at the last point of the previous lap.
+    for lap in range(1, n_laps + 1):
+        idx = [k for k, l in enumerate(laps) if l == lap]
+        if not idx:
+            continue
+        if idx[0] > 0:
+            idx = [idx[0] - 1] + idx
+        ax.plot([traj[k].x for k in idx], [traj[k].y for k in idx], '-',
+                color=lap_color(lap, n_laps), lw=2, label=f'trajectory lap {lap}',
+                zorder=2 + lap)
     goals = [map_eval.to_arena(T, Pose2(float(w['goal_x']), float(w['goal_y']), 0.0))
              for w in phase['wps']]
     ax.scatter([g.x for g in goals], [g.y for g in goals], s=60, facecolors='none',
-               edgecolors=INK, lw=1.2, label='vertices', zorder=4)
+               edgecolors=INK, lw=1.2, label='vertices', zorder=6)
     for i, t in truth.items():
         ax.scatter([t.x], [t.y], s=90, marker='s', color=INK, zorder=5,
                    label='truth (tape)' if i == min(truth) else None)
         arrow(ax, t, 0.18, color=INK)
         ax.annotate(f'tag {i}', (t.x, t.y), textcoords='offset points', color=INK,
                     xytext=outward(t), ha='center', va='center', fontsize=9)
-    snaps = list(phase['laps'].values())
-    if len(snaps) > 1:
-        first = map_eval.poses_to_arena(T, map_eval.snapshot_poses(snaps[0]))
-        ax.scatter([p.x for p in first.values()], [p.y for p in first.values()], s=40,
-                   facecolors='none', edgecolors=EST, lw=1.2, zorder=5,
-                   label='estimate after lap 1')
-    final = snaps[-1]
+    snaps = list(phase['laps'].items())
+    # Map after every lap but the last: hollow circles in that lap's colour.
+    for lap, snap in snaps[:-1]:
+        est = map_eval.poses_to_arena(T, map_eval.snapshot_poses(snap))
+        ax.scatter([p.x for p in est.values()], [p.y for p in est.values()], s=40,
+                   facecolors='none', edgecolors=lap_color(lap, n_laps), lw=1.5, zorder=7,
+                   label=f'map after lap {lap}')
+    last_lap, final = snaps[-1]
+    fc = lap_color(last_lap, n_laps)
     est = map_eval.poses_to_arena(T, map_eval.snapshot_poses(final))
     for k, m in enumerate(final['landmarks']):
         p = est[m['id']]
         a, b, ang = map_eval.cov_ellipse(map_eval.cov_to_arena(T, np.array(m['cov'])[:2, :2]))
         ax.add_patch(Ellipse((p.x, p.y), 2 * a, 2 * b, angle=math.degrees(ang), fill=False,
-                             ec=EST, lw=1.5, label='2σ ellipse (final)' if k == 0 else None))
-        ax.scatter([p.x], [p.y], s=40, color=EST, ec='white', lw=1, zorder=6,
-                   label='estimate (final)' if k == 0 else None)
-        arrow(ax, p, 0.15, color=EST)
+                             ec=fc, lw=1.5, zorder=7,
+                             label=f'2\u03c3 ellipse after lap {last_lap}' if k == 0 else None))
+        ax.scatter([p.x], [p.y], s=40, color=fc, ec='white', lw=1, zorder=8,
+                   label=f'map after lap {last_lap} (final)' if k == 0 else None)
+        arrow(ax, p, 0.15, color=fc)
     ax.set_aspect('equal')
     ax.set_xlim(-0.3, ARENA + 0.3)
     ax.set_ylim(-0.3, ARENA + 0.3)
     ax.set_xlabel('x (m)', color=INK)
     ax.set_ylabel('y (m)', color=INK)
-    ax.set_title(f'{phase["name"]}: trajectory and map (arena frame; {how})', color=INK,
+    ax.set_title(f'{phase["name"]}: trajectory and map by lap (arena frame; {how})', color=INK,
                  fontsize=11)
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.09), ncol=3, fontsize=8,
               frameon=False)
