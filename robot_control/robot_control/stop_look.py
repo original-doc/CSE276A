@@ -9,6 +9,7 @@ import math
 from dataclasses import dataclass, field
 
 from robot_control import ekf
+from robot_control.estimator import GATE, REJECTED, TagRecord, UPDATE
 from robot_control.se2 import angle_between, wrap_angle
 from robot_control.step_timing import min_step, pick_level
 
@@ -195,7 +196,7 @@ def step_motion(step):
 class NavLog:
     """Hooks for logging; the ROS node overrides them (all no-ops here)."""
 
-    def on_look(self, goal_index, records, pose, P):
+    def on_look(self, goal_index, records, estimator):
         pass
 
     def on_step(self, goal_index, step, pose_before, pose_after, P, timing=None):
@@ -204,14 +205,6 @@ class NavLog:
 
     def on_waypoint(self, result):
         pass
-
-
-@dataclass
-class TagRecord:
-    obs: object         # TagObs
-    accepted: bool
-    d2: float
-    reason: str = ''
 
 
 @dataclass
@@ -231,54 +224,39 @@ class Navigator:
     """look() -> (accepted {id: TagObs}, rejected {id: reason});
     execute(step) runs it and may return its (t_start, t_stop)."""
 
-    def __init__(self, landmark_map, calib, params, noise, start_pose, look, execute,
-                 log=None):
-        self.map = landmark_map
+    def __init__(self, estimator, calib, params, look, execute, log=None):
+        self.estimator = estimator
         self.calib = calib
         self.p = params
-        self.noise = noise
-        self.x = ekf.state_from_pose(start_pose)
-        self.P = ekf.initial_covariance(noise)
         self.look = look
         self.execute = execute
         self.log = log or NavLog()
         self.all_rejected_looks = 0
 
     def pose(self):
-        return ekf.pose_from_state(self.x)
+        return self.estimator.pose()
 
     def update_from_look(self, goal_index):
-        """One look -> EKF updates, nearest tag first. Returns ids that were used."""
+        """One look -> estimator update. Returns ids that corrected the pose."""
         accepted, rejected = self.look()
-        records = [TagRecord(None, False, 0.0, f'tag {i}: {why}') for i, why in rejected.items()]
-        used = []
-        for obs in sorted(accepted.values(), key=lambda o: o.dist):
-            lm = self.map.get(obs.id)
-            if lm is None:
-                records.append(TagRecord(obs, False, 0.0, 'not in map'))
-                continue
-            r = ekf.update(self.x, self.P, obs, lm, self.noise)
-            records.append(TagRecord(obs, r.accepted, r.d2, '' if r.accepted else 'gate'))
-            if r.accepted:
-                self.x, self.P = r.x, r.P
-                used.append(obs.id)
-        self.check_consistency(accepted, used)
-        self.log.on_look(goal_index, records, self.pose(), self.P)
-        return used
+        records = [TagRecord(None, REJECTED, 0.0, f'tag {i}: {why}')
+                   for i, why in rejected.items()]
+        records += self.estimator.update(accepted)
+        self.check_consistency(records)
+        self.log.on_look(goal_index, records, self.estimator)
+        return [r.obs.id for r in records if r.action == UPDATE]
 
-    def check_consistency(self, accepted, used):
-        if accepted and not used:
-            self.all_rejected_looks += 1
-        elif used:
+    def check_consistency(self, records):
+        actions = {r.action for r in records}
+        if UPDATE in actions:
             self.all_rejected_looks = 0
+        elif GATE in actions:
+            self.all_rejected_looks += 1
         if self.all_rejected_looks >= 2:
-            raise NavigationHalt('two looks in a row with every tag rejected by the gate')
+            raise NavigationHalt('two looks in a row with every known tag rejected by the gate')
 
     def predict(self, move):
-        if move.kind == 'drive':
-            self.x, self.P = ekf.predict_drive(self.x, self.P, move.value, self.noise)
-        else:
-            self.x, self.P = ekf.predict_spin(self.x, self.P, move.value, self.noise)
+        self.estimator.predict(move)
 
     def act(self, goal_index, move):
         """Time, execute and predict one move. Returns the Step, or None if it has no T."""
@@ -288,12 +266,13 @@ class Navigator:
         before = self.pose()
         timing = self.execute(step)
         self.predict(step_motion(step))
-        self.log.on_step(goal_index, step, before, self.pose(), self.P, timing)
+        self.log.on_step(goal_index, step, before, self.pose(),
+                         self.estimator.pose_cov(), timing)
         return step
 
     def choose_move(self, goal, tag_based, searched):
         """Next move, and the id of the tag it searches for (None if not a search)."""
-        pose, landmarks = self.pose(), self.map.landmarks.values()
+        pose, landmarks = self.pose(), self.estimator.landmarks()
         move = next_move(pose, goal, self.p,
                          lambda m: not below_min_step(m, self.calib, self.p))
         if move is None and not tag_based and len(searched) < self.p.max_searches:
@@ -303,8 +282,8 @@ class Navigator:
         return split_spin(pose, move, landmarks, self.p), None
 
     def result(self, index, goal, reached, tag_based, iters, used, note=''):
-        r = WaypointResult(index, goal, reached, tag_based, self.pose(), ekf.sigmas(self.P),
-                           iters, sorted(used), note)
+        r = WaypointResult(index, goal, reached, tag_based, self.pose(),
+                           ekf.sigmas(self.estimator.pose_cov()), iters, sorted(used), note)
         self.log.on_waypoint(r)
         return r
 

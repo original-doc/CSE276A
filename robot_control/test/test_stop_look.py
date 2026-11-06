@@ -7,6 +7,7 @@ import yaml
 from sim_rover import SimNoise, SimRover
 
 from robot_control.ekf import noise_from_config
+from robot_control.estimator import LocalizationEstimator
 from robot_control.landmark_map import Landmark, LandmarkMap, load_map
 from robot_control.ol_model import Calibration
 from robot_control.ol_planner import Step, load_waypoints
@@ -26,6 +27,10 @@ NOISE = noise_from_config(NAV['ekf'])
 MAP = load_map(os.path.join(CONFIG, 'landmarks.yaml'))
 WPS = load_waypoints(os.path.join(HERE, '..', '..', 'HW2', 'waypoints.txt'))
 GOALS = [Pose2(*w) for w in WPS[1:]]
+
+
+def localizer(landmark_map, start=Pose2(0.0, 0.0, 0.0)):
+    return LocalizationEstimator(landmark_map, start, NOISE)
 
 
 def make_calib(tmp_path):
@@ -154,7 +159,7 @@ class RecordLog(NavLog):
     def __init__(self):
         self.looks, self.steps, self.waypoints = [], [], []
 
-    def on_look(self, goal_index, records, pose, P):
+    def on_look(self, goal_index, records, estimator):
         self.looks.append((goal_index, records))
 
     def on_step(self, goal_index, step, before, after, P, timing=None):
@@ -167,8 +172,8 @@ class RecordLog(NavLog):
 def run_sim(tmp_path, seed, landmark_map=MAP, noise=None):
     rover = SimRover(landmark_map, Pose2(0.0, 0.0, 0.0), np.random.default_rng(seed), noise)
     log = RecordLog()
-    nav = Navigator(landmark_map, make_calib(tmp_path), P, NOISE, Pose2(0.0, 0.0, 0.0),
-                    rover.look, rover.execute, log)
+    nav = Navigator(localizer(landmark_map), make_calib(tmp_path), P, rover.look, rover.execute,
+                    log)
     results = []
     for i, goal in enumerate(GOALS, 1):
         results.append(nav.run_goal(i, goal))
@@ -204,8 +209,8 @@ def test_sim_searches_when_no_tag_at_waypoint(tmp_path):
     only_tag1 = LandmarkMap(0.166, {1: MAP.get(1)})
     rover = SimRover(only_tag1, Pose2(0.0, 0.0, 0.0), np.random.default_rng(1))
     log = RecordLog()
-    nav = Navigator(only_tag1, make_calib(tmp_path), P, NOISE, Pose2(0.0, 0.0, 0.0),
-                    rover.look, rover.execute, log)
+    nav = Navigator(localizer(only_tag1), make_calib(tmp_path), P, rover.look, rover.execute,
+                    log)
     r = nav.run_goal(1, GOALS[0])
     spins = [s for _, s in log.steps if s.kind == 'spin']
     assert spins[0].dir == 'ccw' and spins[0].amount > 80     # turned to tag 1
@@ -215,8 +220,7 @@ def test_sim_searches_when_no_tag_at_waypoint(tmp_path):
 def test_sim_prediction_only_when_no_tag_reachable(tmp_path):
     far_tag = LandmarkMap(0.166, {5: Landmark(5, 5.0, 5.0, math.pi)})
     rover = SimRover(far_tag, Pose2(0.0, 0.0, 0.0), np.random.default_rng(1))
-    nav = Navigator(far_tag, make_calib(tmp_path), P, NOISE, Pose2(0.0, 0.0, 0.0),
-                    rover.look, rover.execute)
+    nav = Navigator(localizer(far_tag), make_calib(tmp_path), P, rover.look, rover.execute)
     r = nav.run_goal(1, GOALS[0])
     assert r.reached and not r.tag_based
     assert 'prediction only' in r.note
@@ -226,8 +230,8 @@ def test_each_tag_searched_once(tmp_path):
     # tags exist in the map but the camera never sees them
     rover = SimRover(MAP, Pose2(0.0, 0.0, 0.0), np.random.default_rng(0))
     log = RecordLog()
-    nav = Navigator(MAP, make_calib(tmp_path), P, NOISE, Pose2(0.0, 0.0, 0.0),
-                    lambda: ({}, {}), rover.execute, log)
+    nav = Navigator(localizer(MAP), make_calib(tmp_path), P, lambda: ({}, {}), rover.execute,
+                    log)
     r = nav.run_goal(3, Pose2(0.0, 0.0, 0.0))     # already there: only searching is left
     big_turns = [s for _, s in log.steps if s.kind == 'spin' and s.amount > 30]
     assert r.reached and not r.tag_based
@@ -238,8 +242,7 @@ def test_halt_when_map_is_wrong(tmp_path):
     shifted = LandmarkMap(0.166, {i: Landmark(i, lm.x + 0.5, lm.y, lm.yaw)
                                   for i, lm in MAP.landmarks.items()})
     rover = SimRover(MAP, Pose2(0.0, 0.0, 0.0), np.random.default_rng(0))
-    nav = Navigator(shifted, make_calib(tmp_path), P, NOISE, Pose2(0.0, 0.0, 0.0),
-                    rover.look, rover.execute)
+    nav = Navigator(localizer(shifted), make_calib(tmp_path), P, rover.look, rover.execute)
     with pytest.raises(NavigationHalt):
         nav.run(GOALS)
 

@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 import yaml
 from sim_rover import SimRover
-from test_stop_look import GOALS, MAP, NOISE, P, make_calib
+from test_stop_look import GOALS, MAP, P, localizer, make_calib
 
 from robot_control.nav_log import CsvNavLog, TeeLog, TrajectorySampler, interpolate
 from robot_control.se2 import Pose2
@@ -89,8 +89,7 @@ def write_sim_run(tmp_path, seed=3):
         def on_waypoint(self, result):
             seen.append(result.index)
 
-    nav = Navigator(MAP, make_calib(tmp_path), P, NOISE, Pose2(0, 0, 0), look, execute,
-                    TeeLog(log, Spy()))
+    nav = Navigator(localizer(MAP), make_calib(tmp_path), P, look, execute, TeeLog(log, Spy()))
     results = nav.run(GOALS)
     log.close()
     assert seen == [1, 2, 3]

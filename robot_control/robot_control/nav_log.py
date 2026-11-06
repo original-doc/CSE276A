@@ -112,7 +112,7 @@ class CsvNavLog(NavLog):
 
     # ---------- NavLog hooks ----------
 
-    def on_look(self, goal_index, records, pose, P):
+    def on_look(self, goal_index, records, estimator):
         t = self.now()
         for r in records:
             o = r.obs
@@ -122,7 +122,7 @@ class CsvNavLog(NavLog):
             self.obs.writerow([f'{t:.2f}', goal_index, *cells, int(r.accepted),
                                f'{r.d2:.2f}', r.reason])
         if any(r.accepted for r in records):
-            self.sampler.set(t, pose, sigmas(P), 'update')
+            self.sampler.set(t, estimator.pose(), sigmas(estimator.pose_cov()), 'update')
         self.flush()
 
     def on_step(self, goal_index, step, pose_before, pose_after, P, timing=None):

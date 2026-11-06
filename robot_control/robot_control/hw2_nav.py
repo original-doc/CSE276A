@@ -18,6 +18,7 @@ from rclpy.executors import SingleThreadedExecutor
 from tf2_ros import TransformBroadcaster
 
 from robot_control import ekf, ol_node
+from robot_control.estimator import LocalizationEstimator
 from robot_control.landmark_map import load_map
 from robot_control.nav_log import CsvNavLog, TeeLog
 from robot_control.ol_model import DEFAULT_CALIB_DIR, Calibration, ModelError
@@ -72,8 +73,8 @@ class PosePublisher(NavLog):
         r.x, r.y, r.z, r.w = qx, qy, qz, qw
         self.tf.sendTransform(t)
 
-    def on_look(self, goal_index, records, pose, P):
-        self.publish(pose, P)
+    def on_look(self, goal_index, records, estimator):
+        self.publish(estimator.pose(), estimator.pose_cov())
 
     def on_step(self, goal_index, step, pose_before, pose_after, P, timing=None):
         self.publish(pose_after, P)
@@ -137,8 +138,8 @@ class Hw2NavNode(ol_node.MotorNode):
         return log
 
     def navigator(self, log):
-        return Navigator(self.map, self.calib, self.params, self.noise, self.start,
-                         self.look, self.execute, log)
+        est = LocalizationEstimator(self.map, self.start, self.noise)
+        return Navigator(est, self.calib, self.params, self.look, self.execute, log)
 
     def run_dry(self):
         """Look a few times and print the estimate and the first planned step."""
@@ -146,7 +147,7 @@ class Hw2NavNode(ol_node.MotorNode):
         for _ in range(DRY_LOOKS):
             nav.update_from_look(1)
             pose = nav.pose()
-            sx, sy, st = ekf.sigmas(nav.P)
+            sx, sy, st = ekf.sigmas(nav.estimator.pose_cov())
             move = next_move(pose, self.goals[0], self.params)
             plan = to_step(move, self.calib, self.params).describe() if move else 'reached'
             print(f'estimate ({pose.x:+.3f}, {pose.y:+.3f}, {math.degrees(pose.theta):+.1f} deg)'
