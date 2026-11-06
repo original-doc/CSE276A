@@ -34,7 +34,7 @@ control:
                         #   1.5-2.4x the plan on 2026-11-06 (e.g. 10.7 deg -> 25.6 deg)
   coarse_min_deg: 25.0  # coarse spin 0.35 from T 0.2 s (~25 deg) turned 0.7-1.0x the plan; turns
                         #   between fine_max and this are done as equal fine turns <= fine_max
-  near_dist: 0.15       # m: this close to a vertex, an aligning turn > near_turn_deg is skipped
+  near_dist: 0.3        # m (was 0.15): this close to a vertex, an aligning turn > near_turn_deg is skipped
   near_turn_deg: 45.0   #   (go straight to the vertex heading instead)
 
 slam:                   # a new tag is added only from an observation this close and frontal

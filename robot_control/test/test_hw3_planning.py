@@ -27,7 +27,7 @@ def test_hw3_config_values():
     assert math.degrees(P.fine_max) == pytest.approx(7.0)
     assert math.degrees(P.coarse_min) == pytest.approx(25.0)
     assert math.degrees(P.min_split) == pytest.approx(45.0)
-    assert P.near_dist == 0.15
+    assert P.near_dist == 0.3
 
 
 @pytest.mark.parametrize('deg, piece', [(5, 5), (7, 7), (8, 4), (10.7, 5.35), (20.4, 6.8),
@@ -106,3 +106,12 @@ def test_the_halting_look_is_logged():
     with pytest.raises(NavigationHalt):
         nav.update_from_look(1)
     assert len(looks) == 2
+
+
+def test_near_goal_no_turnaround_after_a_pose_jump():
+    # run_085837 vertex 4: a 22 cm correction left the vertex 27 cm behind-left (121 deg);
+    # with near_dist 0.15 it turned 121 deg, drove back and turned -118 deg (30 deg short)
+    goal = Pose2(-0.4393, 0.0, 0.0)
+    assert next_move(Pose2(-0.3174, -0.2413, r(-4.14)), goal, P) is None    # heading within tol
+    m = next_move(Pose2(-0.3174, -0.2413, r(-20.0)), goal, P)
+    assert m.kind == 'spin' and math.degrees(m.value) == pytest.approx(20.0)
