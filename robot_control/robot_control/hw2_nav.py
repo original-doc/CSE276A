@@ -45,18 +45,19 @@ def load_yaml(path):
 
 
 class PosePublisher(NavLog):
-    """Publishes the estimate as /hw2/pose and TF world -> base_link (for Foxglove)."""
+    """Publishes the estimate as <topic> and TF <frame> -> base_link (for Foxglove)."""
 
-    def __init__(self, node):
+    def __init__(self, node, topic='hw2/pose', frame='world'):
         self.node = node
-        self.pub = node.create_publisher(PoseWithCovarianceStamped, 'hw2/pose', 10)
+        self.frame = frame
+        self.pub = node.create_publisher(PoseWithCovarianceStamped, topic, 10)
         self.tf = TransformBroadcaster(node)
 
     def publish(self, pose, P):
         stamp = self.node.get_clock().now().to_msg()
         qx, qy, qz, qw = yaw_to_quat(pose.theta)
         msg = PoseWithCovarianceStamped()
-        msg.header.stamp, msg.header.frame_id = stamp, 'world'
+        msg.header.stamp, msg.header.frame_id = stamp, self.frame
         p = msg.pose.pose
         p.position.x, p.position.y = pose.x, pose.y
         p.orientation.x, p.orientation.y, p.orientation.z, p.orientation.w = qx, qy, qz, qw
@@ -67,7 +68,7 @@ class PosePublisher(NavLog):
         msg.pose.covariance = cov
         self.pub.publish(msg)
         t = TransformStamped()
-        t.header.stamp, t.header.frame_id, t.child_frame_id = stamp, 'world', 'base_link'
+        t.header.stamp, t.header.frame_id, t.child_frame_id = stamp, self.frame, 'base_link'
         t.transform.translation.x, t.transform.translation.y = pose.x, pose.y
         r = t.transform.rotation
         r.x, r.y, r.z, r.w = qx, qy, qz, qw

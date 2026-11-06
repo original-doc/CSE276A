@@ -69,6 +69,15 @@ def cov_to_arena(T_arena_start, cov_xy):
     return R @ np.asarray(cov_xy) @ R.T
 
 
+def cov_ellipse(cov_xy, k=2.0):
+    """k-sigma ellipse of a 2x2 covariance -> (major semi-axis, minor semi-axis, angle rad)."""
+    vals, vecs = np.linalg.eigh(np.asarray(cov_xy, dtype=float))
+    vals = np.clip(vals, 0.0, None)
+    major = vecs[:, 1]
+    return (k * math.sqrt(vals[1]), k * math.sqrt(vals[0]),
+            math.atan2(major[1], major[0]))
+
+
 def landmark_errors(est, truth):
     """est, truth: {id: Pose2} in the same frame -> MapErrors."""
     common = sorted(set(est) & set(truth))

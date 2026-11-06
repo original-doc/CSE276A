@@ -15,6 +15,7 @@ setup(
         ('share/' + package_name + '/launch', glob('launch/*.py')),
         ('share/' + package_name + '/config/open_loop', glob('config/open_loop/*.yaml')),
         ('share/' + package_name + '/config/hw2', glob('config/hw2/*.yaml')),
+        ('share/' + package_name + '/config/hw3', glob('config/hw3/*.yaml')),
     ],
     install_requires=[
         'setuptools',
@@ -36,6 +37,7 @@ setup(
             'ol_calibrate = robot_control.ol_calibrate:main',
             'hw2_probe = robot_control.hw2_probe:main',
             'hw2_nav = robot_control.hw2_nav:main',
+            'hw3_slam = robot_control.hw3_slam:main',
         ],
     },
 )

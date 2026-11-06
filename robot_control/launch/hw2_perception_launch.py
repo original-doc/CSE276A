@@ -1,6 +1,7 @@
-"""HW2 perception: rectified camera + AprilTag detector + base_link -> camera_frame TF.
+"""Perception: rectified camera + AprilTag detector + base_link -> camera_frame TF.
 
-ros2 launch robot_control hw2_perception_launch.py
+ros2 launch robot_control hw2_perception_launch.py [apriltag_config:=<yaml>]
+(default: config/hw2/apriltag.yaml; HW3 passes config/hw3/apriltag.yaml)
 """
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
@@ -16,6 +17,8 @@ def generate_launch_description():
         DeclareLaunchArgument('cam_x', default_value='0.075'),
         DeclareLaunchArgument('cam_y', default_value='0.0'),
         DeclareLaunchArgument('cam_z', default_value='0.125'),
+        DeclareLaunchArgument('apriltag_config', default_value=PathJoinSubstitution([
+            FindPackageShare('robot_control'), 'config', 'hw2', 'apriltag.yaml'])),
     ]
 
     camera = IncludeLaunchDescription(
@@ -34,8 +37,7 @@ def generate_launch_description():
             ('image_rect', '/camera/image_raw'),
             ('camera_info', '/camera/camera_info'),
         ],
-        parameters=[PathJoinSubstitution([
-            FindPackageShare('robot_control'), 'config', 'hw2', 'apriltag.yaml'])],
+        parameters=[LaunchConfiguration('apriltag_config')],
     )
 
     # Level camera: optical axes (x right, y down, z forward) -> base (x fwd, y left, z up).

@@ -6,7 +6,7 @@ import yaml
 from sim_hw3 import arena_map
 
 from robot_control.map_eval import (
-    align, best_fit_rigid, cov_to_arena, landmark_errors, load_start, mean_error,
+    align, best_fit_rigid, cov_ellipse, cov_to_arena, landmark_errors, load_start, mean_error,
     poses_to_arena, rigid_to_pose, snapshot_poses, to_arena, truth_poses,
 )
 from robot_control.se2 import Pose2, compose, inverse, wrap_angle
@@ -120,3 +120,13 @@ def test_load_start_and_snapshot(tmp_path):
     assert load_start(p) == pytest.approx(Pose2(1.2, 0.75, math.pi / 2))
     snap = {'landmarks': [{'id': 3, 'x': 1.0, 'y': 2.0, 'yaw': 0.5, 'cov': []}]}
     assert snapshot_poses(snap) == {3: Pose2(1.0, 2.0, 0.5)}
+
+
+def test_cov_ellipse_axes_and_angle():
+    a, b, ang = cov_ellipse(np.diag([0.01, 0.04]), k=2.0)
+    assert (a, b) == pytest.approx((0.4, 0.2))
+    assert abs(math.cos(ang)) == pytest.approx(0.0, abs=1e-12)       # major along y
+    R = np.array([[math.cos(0.5), -math.sin(0.5)], [math.sin(0.5), math.cos(0.5)]])
+    a, b, ang = cov_ellipse(R @ np.diag([0.09, 0.01]) @ R.T, k=1.0)
+    assert (a, b) == pytest.approx((0.3, 0.1))
+    assert math.tan(ang) == pytest.approx(math.tan(0.5))
