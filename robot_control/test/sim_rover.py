@@ -18,6 +18,8 @@ class SimNoise:
     obs_psi: float = math.radians(1.0)
     obs_xy_b: float = 0.0           # extra xy std per m^2 of distance (0 = constant)
     obs_psi_e: float = 0.0          # extra psi std per m of distance
+    slow_fine_T: float = math.inf   # fine spins (cmd 0.25) at least this long ...
+    slow_fine_scale: float = 1.0    # ... turn this much more (2026-11-06: 1.5-2.4x)
     half_fov: float = math.radians(45.0)
     max_dist: float = 3.0
     max_oblique: float = math.radians(60.0)
@@ -37,7 +39,9 @@ class SimRover:
             self.drive(step.amount)
         else:
             sign = 1.0 if step.dir == 'ccw' else -1.0
-            self.spin(sign * math.radians(step.amount))
+            slow_fine = step.cmd == 0.25 and step.T is not None and step.T >= self.n.slow_fine_T
+            scale = self.n.slow_fine_scale if slow_fine else 1.0
+            self.spin(sign * math.radians(step.amount) * scale)
 
     def drive(self, d):
         n = self.n

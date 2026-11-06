@@ -24,24 +24,29 @@ r = math.radians
 
 
 def test_hw3_config_values():
-    assert math.degrees(P.fine_max) == pytest.approx(12.0)
-    assert math.degrees(P.coarse_min) == pytest.approx(45.0)
+    assert math.degrees(P.fine_max) == pytest.approx(7.0)
+    assert math.degrees(P.coarse_min) == pytest.approx(25.0)
     assert math.degrees(P.min_split) == pytest.approx(45.0)
     assert P.near_dist == 0.15
 
 
-@pytest.mark.parametrize('deg, piece', [(8, 8), (12, 12), (13, 6.5), (20.4, 10.2), (30, 10),
-                                        (44, 11), (45, 45), (90, 90), (-30, -10)])
+@pytest.mark.parametrize('deg, piece', [(5, 5), (7, 7), (8, 4), (10.7, 5.35), (20.4, 6.8),
+                                        (24, 6), (25, 25), (45, 45), (90, 90), (-15, -5)])
 def test_calibrated_spin_pieces(deg, piece):
     m = calibrated_spin(Move('spin', r(deg)), P)
     assert math.degrees(m.value) == pytest.approx(piece)
 
 
-@pytest.mark.parametrize('deg', [5, 10, 12, 20.4, 23, 30, 44, 45, 60, 90, 135, 180])
-def test_every_turn_gets_a_calibrated_step(deg):
-    # 2026-11-06: 20.4 deg had no level ("no calibrated level") and a vertex was skipped
+@pytest.mark.parametrize('deg', [5, 7, 10.7, 12, 20.4, 23, 25, 30, 44, 45, 60, 90, 135, 180])
+def test_every_turn_gets_a_usable_step(deg):
+    # 2026-11-06: 20.4 deg had no level ("no calibrated level") and a vertex was skipped;
+    # fine spins longer than ~0.35 s turned 1.5-2.4x the plan
     step = to_step(calibrated_spin(Move('spin', r(deg)), P), CALIB, P)
-    assert step.T is not None and not step.warn, (deg, step.warn)
+    assert step.T is not None, deg
+    if step.cmd == 0.25:
+        assert step.T <= 0.32 and not step.warn
+    else:
+        assert step.T >= 0.2         # coarse from ~25 deg (short T measured 0.7-1.0x)
 
 
 def test_calibrated_spin_leaves_drives_and_none():
