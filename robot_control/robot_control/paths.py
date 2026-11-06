@@ -55,6 +55,12 @@ def repeat(lap, laps):
     return goals, lap_index
 
 
+def is_lap_end(lap_index, goal_index):
+    """Is goal goal_index (from 1) the last one of its lap?"""
+    i = goal_index
+    return i == len(lap_index) or lap_index[i] != lap_index[i - 1]
+
+
 def make_phases(square_size, square_laps, octagon_laps):
     """Square phase then octagon phase; a phase with 0 laps is left out."""
     m = inscribed_octagon_side(square_size)

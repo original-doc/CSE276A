@@ -4,7 +4,7 @@ import os
 import numpy as np
 import pytest
 import yaml
-from sim_rover import SimNoise, SimRover
+from sim_rover import SimNoise, SimRover, make_calib
 
 from robot_control.ekf import noise_from_config
 from robot_control.estimator import LocalizationEstimator
@@ -31,21 +31,6 @@ GOALS = [Pose2(*w) for w in WPS[1:]]
 
 def localizer(landmark_map, start=Pose2(0.0, 0.0, 0.0)):
     return LocalizationEstimator(landmark_map, start, NOISE)
-
-
-def make_calib(tmp_path):
-    """Coarse levels like study_wood2, plus fine levels (min 1.5 cm / 3 deg)."""
-    c = Calibration.load(tmp_path / 'sim.yaml', 'sim', create=True)
-    for T in (2.0, 3.0, 4.0):
-        c.drive_trials().append({'cmd': 0.3, 'T': T, 'x': 0.396 * T - 0.024, 'y': 0.0})
-    for T in (0.2, 0.4, 0.6):
-        c.drive_trials().append({'cmd': 0.2, 'T': T, 'x': 0.1 * T - 0.005, 'y': 0.0})
-    for d in ('ccw', 'cw'):
-        for T in (0.4, 0.8, 1.6):
-            c.spin_trials(d).append({'cmd': 0.35, 'T': T, 'angle': 125.0 * T - 6.0})
-        for T in (0.2, 0.4, 0.6):
-            c.spin_trials(d).append({'cmd': 0.25, 'T': T, 'angle': 20.0 * T - 1.0})
-    return c
 
 
 # ---------- planning ----------

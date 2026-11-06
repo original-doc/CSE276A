@@ -2,6 +2,7 @@
 import math
 from dataclasses import dataclass
 
+from robot_control.ol_model import Calibration
 from robot_control.se2 import Pose2, angle_between, to_child, wrap_angle
 from robot_control.tag_obs import make_obs
 
@@ -15,6 +16,8 @@ class SimNoise:
     spin_sigma: float = math.radians(2.0)
     obs_xy: float = 0.003           # m, per look (already averaged)
     obs_psi: float = math.radians(1.0)
+    obs_xy_b: float = 0.0           # extra xy std per m^2 of distance (0 = constant)
+    obs_psi_e: float = 0.0          # extra psi std per m of distance
     half_fov: float = math.radians(45.0)
     max_dist: float = 3.0
     max_oblique: float = math.radians(60.0)
@@ -63,8 +66,25 @@ class SimRover:
             if not self.visible(lm):
                 continue
             x, y = to_child(self.true, lm.x, lm.y)
+            d = math.hypot(x, y)
+            s_xy = self.n.obs_xy + self.n.obs_xy_b * d * d
+            s_psi = self.n.obs_psi + self.n.obs_psi_e * d
             seen[lm.id] = make_obs(
-                lm.id, 0.0, x + self.rng.normal(0.0, self.n.obs_xy),
-                y + self.rng.normal(0.0, self.n.obs_xy),
-                lm.yaw - self.true.theta + self.rng.normal(0.0, self.n.obs_psi), 10)
+                lm.id, 0.0, x + self.rng.normal(0.0, s_xy), y + self.rng.normal(0.0, s_xy),
+                lm.yaw - self.true.theta + self.rng.normal(0.0, s_psi), 10)
         return seen, {}
+
+
+def make_calib(tmp_path):
+    """Coarse levels like study_wood2, plus fine levels (min 1.5 cm / 3 deg)."""
+    c = Calibration.load(tmp_path / 'sim.yaml', 'sim', create=True)
+    for T in (2.0, 3.0, 4.0):
+        c.drive_trials().append({'cmd': 0.3, 'T': T, 'x': 0.396 * T - 0.024, 'y': 0.0})
+    for T in (0.2, 0.4, 0.6):
+        c.drive_trials().append({'cmd': 0.2, 'T': T, 'x': 0.1 * T - 0.005, 'y': 0.0})
+    for d in ('ccw', 'cw'):
+        for T in (0.4, 0.8, 1.6):
+            c.spin_trials(d).append({'cmd': 0.35, 'T': T, 'angle': 125.0 * T - 6.0})
+        for T in (0.2, 0.4, 0.6):
+            c.spin_trials(d).append({'cmd': 0.25, 'T': T, 'angle': 20.0 * T - 1.0})
+    return c

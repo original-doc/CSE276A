@@ -24,6 +24,7 @@ import yaml
 from robot_control.ekf import sigmas
 from robot_control.estimator import GATE, INIT, REJECTED, SKIP_INIT, UPDATE
 from robot_control.ol_primitive import wheel_cmds
+from robot_control.paths import is_lap_end
 from robot_control.se2 import Pose2, wrap_angle
 from robot_control.stop_look import NavLog
 
@@ -214,9 +215,8 @@ class SlamCsvLog(CsvNavLog):
 
     def on_waypoint(self, result):
         super().on_waypoint(result)
-        i = result.index
-        if i == len(self.lap_index) or self.lap_index[i] != self.lap_index[i - 1]:
-            self.write_lap_map(self.lap(i))
+        if is_lap_end(self.lap_index, result.index):
+            self.write_lap_map(self.lap(result.index))
 
     def write_lap_map(self, lap):
         stats = {'looks': self.looks[lap], **lap_stats(self.records.get(lap, []))}
