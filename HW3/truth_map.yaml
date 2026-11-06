@@ -3,7 +3,7 @@
 # the same corner; yaw_deg = direction of the tag's outward normal.
 # Nominal values below: replace with the measured ones (E2). NOT given to the filter.
 frame: arena
-tag_size: 0.166
+tag_size: 0.156   # measured by range tests 2026-11-06 (printed ~6 % smaller than the 0.166 PDF)
 landmarks:
   - {id: 0, x: 1.0, y: 0.0, yaw_deg: 90}
   - {id: 1, x: 2.0, y: 0.0, yaw_deg: 90}
