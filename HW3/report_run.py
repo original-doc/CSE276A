@@ -306,7 +306,7 @@ def style(ax):
     ax.tick_params(colors=MUTED, labelcolor=INK)
 
 
-TRAJ_LAP_COLORS = [SERIES[7], SERIES[4], SERIES[0]]     # red, pink, blue: lap 1 -> 3
+TRAJ_LAP_COLORS = [SERIES[7], SERIES[3], SERIES[0]]     # red, yellow, blue: lap 1 -> 3
 LM_LAP_COLORS = ['#f7c59f', '#f29a5c', SERIES[1]]        # light -> full orange: lap 1 -> 3
 
 
