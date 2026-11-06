@@ -1,0 +1,43 @@
+# HW3 EKF-SLAM parameters. Angles in degrees here; code converts to rad.
+# Same as config/hw2/nav.yaml except where noted.
+detector_ids: [0, 1, 2, 3, 4, 5, 6, 7]   # ids the look accepts (= apriltag config); NOT a map
+
+tolerance:              # HW3 scores the map, not waypoint accuracy: looser than HW2
+  pos: 0.05
+  ang_deg: 5.0
+
+levels:
+  drive: [0.3, 0.2]
+  spin: [0.35, 0.25]
+
+look:
+  window_s: 1.0
+  min_count: 3
+  max_spread: 0.02
+  min_dist: 0.25
+  max_dist: 3.0
+  max_oblique_deg: 60.0
+
+control:
+  max_iters: 15
+  max_searches: 2
+  search_max_dist: 2.5
+  align_min_deg: 3.0
+  align_max_deg: 15.0
+  view_half_deg: 35.0
+  max_drive: 0.75       # HW2 1.2: a square side is split in two, one more look in between
+  undershoot_k: 0.03
+  undershoot_c: 0.08
+  undershoot_min: 0.3
+  min_split_deg: 15.0
+  fine_max_deg: 20.0
+
+slam:                   # a new tag is added only from an observation this close and frontal
+  init_max_dist: 2.5
+  init_max_oblique_deg: 45.0
+
+ekf:
+  init_sigma: {xy: 0.0, theta_deg: 0.0}   # map frame = start pose, so no start uncertainty
+  motion: {k_d: 0.08, c_d: 0.01, k_lat: 0.03, k_hd_deg: 2.0, k_s: 0.05, c_s_deg: 2.0}
+  obs: {a: 0.005, b: 0.01, c_deg: 1.5, e_deg: 1.5, oblique_deg: 30.0, oblique_factor: 2.0}
+  gate: 11.34

@@ -4,10 +4,14 @@ An estimator turns executed moves (predict) and one look's tag observations
 (update) into a robot pose estimate, and tells the planner which landmarks
 it knows. HW2: known map (LocalizationEstimator). HW3: EKF-SLAM.
 """
+import math
 from dataclasses import dataclass
 from typing import Protocol
 
-from robot_control import ekf
+import numpy as np
+
+from robot_control import ekf, slam
+from robot_control.se2 import Pose2
 
 # TagRecord.action values
 UPDATE = 'update'           # used to correct the state
@@ -85,3 +89,98 @@ class LocalizationEstimator:
 
     def landmarks(self):
         return list(self.map.landmarks.values())
+
+
+@dataclass(frozen=True)
+class InitLimits:
+    """A new landmark is added only from an observation this close and frontal."""
+
+    max_dist: float     # m
+    max_oblique: float  # rad
+
+
+def init_limits_from_config(cfg):
+    """`slam:` section of slam.yaml -> InitLimits."""
+    return InitLimits(float(cfg['init_max_dist']), math.radians(cfg['init_max_oblique_deg']))
+
+
+class SlamEstimator:
+    """EKF-SLAM: robot pose + every tag seen so far. Starts at the map origin, no landmarks."""
+
+    def __init__(self, noise, init_limits, start_pose=Pose2(0.0, 0.0, 0.0)):
+        self.noise = noise
+        self.limits = init_limits
+        self.s = ekf.state_from_pose(start_pose)
+        self.Sigma = ekf.initial_covariance(noise)
+        self.ids = []           # tag id of landmark k
+        self.n_updates = {}     # tag id -> accepted updates
+
+    def pose(self):
+        return ekf.pose_from_state(self.s)
+
+    def pose_cov(self):
+        return self.Sigma[:3, :3].copy()
+
+    def index(self, tag_id):
+        return self.ids.index(tag_id)
+
+    def predict(self, move):
+        if move.kind == 'drive':
+            self.s, self.Sigma = slam.predict_drive(self.s, self.Sigma, move.value, self.noise)
+        else:
+            self.s, self.Sigma = slam.predict_spin(self.s, self.Sigma, move.value, self.noise)
+
+    def update(self, accepted):
+        """Known tags first (nearest first), then add new ones from the corrected pose."""
+        by_dist = sorted(accepted.values(), key=lambda o: o.dist)
+        known = [o for o in by_dist if o.id in self.ids]
+        new = [o for o in by_dist if o.id not in self.ids]
+        return [self.correct(o) for o in known] + [self.add(o) for o in new]
+
+    def correct(self, obs):
+        r = slam.update(self.s, self.Sigma, obs, self.index(obs.id), self.noise)
+        if not r.accepted:
+            return TagRecord(obs, GATE, r.d2, 'gate')
+        self.s, self.Sigma = r.x, r.P
+        self.n_updates[obs.id] += 1
+        return TagRecord(obs, UPDATE, r.d2)
+
+    def init_problem(self, obs):
+        """Why this observation is not good enough to add a landmark ('' = it is)."""
+        if obs.dist > self.limits.max_dist:
+            return f'dist {obs.dist:.2f} > {self.limits.max_dist:.2f} m'
+        if obs.oblique > self.limits.max_oblique:
+            return (f'oblique {math.degrees(obs.oblique):.0f} > '
+                    f'{math.degrees(self.limits.max_oblique):.0f} deg')
+        return ''
+
+    def add(self, obs):
+        problem = self.init_problem(obs)
+        if problem:
+            return TagRecord(obs, SKIP_INIT, 0.0, problem)
+        self.s, self.Sigma = slam.augment(self.s, self.Sigma, obs, self.noise)
+        self.ids.append(obs.id)
+        self.n_updates[obs.id] = 0
+        return TagRecord(obs, INIT, 0.0)
+
+    def landmarks(self):
+        return [slam.as_landmark(self.s, k, tag_id) for k, tag_id in enumerate(self.ids)]
+
+    def landmark_cov(self, tag_id):
+        return slam.landmark_cov(self.Sigma, self.index(tag_id))
+
+    def state(self):
+        """(s, Sigma, ids): copies of the full state."""
+        return self.s.copy(), self.Sigma.copy(), list(self.ids)
+
+    def snapshot(self):
+        """Plain-python summary for logs: robot pose and every landmark with its covariance."""
+        p = self.pose()
+        return {
+            'robot': {'x': p.x, 'y': p.y, 'theta': p.theta,
+                      'cov': np.asarray(self.pose_cov()).tolist()},
+            'landmarks': [{'id': lm.id, 'x': lm.x, 'y': lm.y, 'yaw': lm.yaw,
+                           'cov': self.landmark_cov(lm.id).tolist(),
+                           'n_updates': self.n_updates[lm.id]}
+                          for lm in self.landmarks()],
+        }
