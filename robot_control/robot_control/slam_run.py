@@ -13,7 +13,9 @@ from robot_control.ekf import noise_from_config, sigmas
 from robot_control.estimator import SlamEstimator, init_limits_from_config
 from robot_control.nav_log import SlamCsvLog, TeeLog, new_run_dir, write_yaml
 from robot_control.paths import is_lap_end, make_phases
-from robot_control.stop_look import Navigator, NavLog, next_move, params_from_config, to_step
+from robot_control.stop_look import (
+    NavigationHalt, Navigator, NavLog, next_move, params_from_config, to_step,
+)
 
 
 @dataclass
@@ -115,6 +117,7 @@ class Hw3Session:
         self.out = out
         self.clock = clock
         self.run_dir = None
+        self.console = None     # run_dir/console.txt while a run is going
 
     def new_estimator(self):
         return SlamEstimator(self.noise, self.limits)
@@ -129,23 +132,41 @@ class Hw3Session:
 
     # ---------- full run ----------
 
+    def say(self, text):
+        """Print, and append to console.txt during a run."""
+        self.out(text)
+        if self.console is not None:
+            self.console.write(text + '\n')
+            self.console.flush()
+
     def run(self):
         """All phases; returns list[PhaseResult]. Logs go to <log_root>/run_<time>/."""
         self.run_dir = new_run_dir(self.log_root)
         os.makedirs(self.run_dir)
         write_yaml(os.path.join(self.run_dir, 'config.yaml'),
                    {**self.run_config, 'options': self.opts.__dict__, 'slam': self.cfg})
-        self.out(f'log: {self.run_dir}')
-        self.countdown(self.opts.countdown_s, 'starting in')
-        return run_phases(self.phases(), self.new_estimator, self.run_phase, self.opts.reset,
-                          self.between)
+        self.console = open(os.path.join(self.run_dir, 'console.txt'), 'w')
+        try:
+            self.say(f'log: {self.run_dir}')
+            self.countdown(self.opts.countdown_s, 'starting in')
+            return run_phases(self.phases(), self.new_estimator, self.run_phase,
+                              self.opts.reset, self.between)
+        except NavigationHalt as e:
+            self.say(f'HALT: {e}')
+            raise
+        except KeyboardInterrupt:
+            self.say('Aborted (Ctrl-C).')
+            raise
+        finally:
+            self.console.close()
+            self.console = None
 
     def run_phase(self, phase, est):
         log = SlamCsvLog(os.path.join(self.run_dir, phase.name), est, phase.lap_index,
                          self.clock)
         lap_end = LapEnd(phase.lap_index, est, lambda lap, e: self.print_lap(phase, lap, e))
         nav = self.navigator(est, TeeLog(log, lap_end))
-        self.out(f'=== phase {phase.name}: {len(phase.goals)} vertices, '
+        self.say(f'=== phase {phase.name}: {len(phase.goals)} vertices, '
                  f'{phase.lap_index[-1]} laps; map frame = current pose; '
                  f'measure it into {os.path.join(log.dir, "start.yaml")}')
         try:
@@ -154,24 +175,24 @@ class Hw3Session:
             log.close()
 
     def after_goal(self, phase, r):
-        self.out(result_line(phase.name, phase.lap_index[r.index - 1], r))
+        self.say(result_line(phase.name, phase.lap_index[r.index - 1], r))
         self.sleep(self.opts.wp_pause_s)
 
     def print_lap(self, phase, lap, est):
-        self.out(f'--- {phase.name} lap {lap} done: {len(est.ids)} landmarks')
+        self.say(f'--- {phase.name} lap {lap} done: {len(est.ids)} landmarks')
         for line in map_table(est):
-            self.out(line)
+            self.say(line)
 
     def between(self, prev, nxt):
         path = os.path.join(self.run_dir, nxt.name, 'start.yaml')
         reset = 'reset: new map frame here' if self.opts.reset else 'no reset: same map'
-        self.out(f'=== {prev.name} done. Mark and measure the robot pose now '
+        self.say(f'=== {prev.name} done. Mark and measure the robot pose now '
                  f'(write it into {path}); {reset}')
         self.countdown(int(self.opts.phase_pause_s), f'{nxt.name} starts in')
 
     def countdown(self, seconds, label):
         for i in range(seconds, 0, -1):
-            self.out(f'{label} {i}...')
+            self.say(f'{label} {i}...')
             self.sleep(1.0)
 
     # ---------- dry run ----------
@@ -186,8 +207,8 @@ class Hw3Session:
             move = next_move(est.pose(), goal, self.params)
             plan = to_step(move, self.calib, self.params).describe() if move else 'reached'
             sx, sy, st = sigmas(est.pose_cov())
-            self.out(f'estimate {fmt_pose(est.pose())} sigma ({sx:.3f}, {sy:.3f}, '
+            self.say(f'estimate {fmt_pose(est.pose())} sigma ({sx:.3f}, {sy:.3f}, '
                      f'{math.degrees(st):.1f} deg); {len(est.ids)} landmarks -> {plan}')
         for line in map_table(est):
-            self.out(line)
+            self.say(line)
         return est

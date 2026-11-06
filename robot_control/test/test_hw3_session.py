@@ -44,7 +44,7 @@ def test_run_writes_both_phases_and_pauses_between(tmp_path):
     rig = Rig(tmp_path, OPTS)
     out = rig.session.run()
     run_dir = rig.session.run_dir
-    assert sorted(os.listdir(run_dir)) == ['config.yaml', 'octagon', 'square']
+    assert sorted(os.listdir(run_dir)) == ['config.yaml', 'console.txt', 'octagon', 'square']
     for phase in ('square', 'octagon'):
         files = os.listdir(os.path.join(run_dir, phase))
         assert 'map_lap1.yaml' in files and 'final_state.npz' in files
@@ -92,3 +92,15 @@ def test_halt_still_closes_the_phase_log(tmp_path):
     with pytest.raises(NavigationHalt):
         rig.session.run()
     assert 'final_state.npz' in os.listdir(os.path.join(rig.session.run_dir, 'square'))
+    with open(os.path.join(rig.session.run_dir, 'console.txt')) as f:
+        console = f.read()
+    assert console.splitlines()[-1].startswith('HALT: ')
+
+
+def test_console_has_the_printed_lines(tmp_path):
+    rig = Rig(tmp_path, OPTS)
+    rig.session.run()
+    with open(os.path.join(rig.session.run_dir, 'console.txt')) as f:
+        console = f.read().splitlines()
+    assert console == rig.lines
+    assert any(line.startswith('>>> square lap 1 vertex 5') for line in console)

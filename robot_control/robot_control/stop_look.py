@@ -34,6 +34,9 @@ class NavParams:
     undershoot_min: float   # m
     drive_levels: tuple
     spin_levels: tuple
+    coarse_min: float = 0.0     # rad, smallest calibrated coarse spin; 0 = off (HW2)
+    near_dist: float = 0.0      # m, near the goal skip big aligning turns; 0 = off (HW2)
+    near_turn: float = math.pi  # rad, "big" aligning turn within near_dist
 
 
 def params_from_config(cfg):
@@ -50,7 +53,9 @@ def params_from_config(cfg):
         fine_max=r(c['fine_max_deg']),
         max_drive=float(c['max_drive']), undershoot_k=float(c['undershoot_k']),
         undershoot_c=float(c['undershoot_c']), undershoot_min=float(c['undershoot_min']),
-        drive_levels=tuple(lv['drive']), spin_levels=tuple(lv['spin']))
+        drive_levels=tuple(lv['drive']), spin_levels=tuple(lv['spin']),
+        coarse_min=r(c.get('coarse_min_deg', 0.0)), near_dist=float(c.get('near_dist', 0.0)),
+        near_turn=r(c.get('near_turn_deg', 180.0)))
 
 
 @dataclass(frozen=True)
@@ -85,8 +90,8 @@ def next_move(pose, goal, p, feasible=lambda move: True):
     """
     dx, dy = goal.x - pose.x, goal.y - pose.y
     dist = math.hypot(dx, dy)
-    if dist > p.pos_tol and feasible(Move('drive', dist)):
-        bearing = wrap_angle(math.atan2(dy, dx) - pose.theta)
+    bearing = wrap_angle(math.atan2(dy, dx) - pose.theta)
+    if dist > p.pos_tol and feasible(Move('drive', dist)) and not near_skip(dist, bearing, p):
         align = Move('spin', bearing)
         if abs(bearing) > align_tol(dist, p) and feasible(align):
             return align
@@ -97,6 +102,23 @@ def next_move(pose, goal, p, feasible=lambda move: True):
     if abs(turn) > p.ang_tol:
         return Move('spin', turn)
     return None
+
+
+def near_skip(dist, bearing, p):
+    """Close to the goal but behind / beside it: not worth a big turn and back."""
+    return dist <= p.near_dist and abs(bearing) > p.near_turn
+
+
+def calibrated_spin(move, p):
+    """Split a spin between the fine and coarse calibrated ranges into equal fine turns.
+
+    Returns the first piece; the rest is re-planned after the next look.
+    """
+    a = abs(move.value) if move is not None and move.kind == 'spin' else 0.0
+    if not (p.fine_max < a < p.coarse_min):
+        return move
+    pieces = math.ceil(a / p.fine_max)
+    return Move('spin', move.value / pieces)
 
 
 def tag_oblique_from(pose, lm):
@@ -154,7 +176,9 @@ def split_spin(pose, move, landmarks, p):
         t = b + p.view_half if move.value > 0 else b - p.view_half
         if t * move.value > 0 and abs(t) < abs(move.value):
             best = t if abs(t) > abs(best) else best
-    return Move('spin', best) if abs(best) >= p.min_split else move
+    if abs(best) < p.min_split or abs(move.value - best) < p.min_split:
+        return move
+    return Move('spin', best)
 
 
 def move_to_primitive(move):
@@ -242,8 +266,8 @@ class Navigator:
         records = [TagRecord(None, REJECTED, 0.0, f'tag {i}: {why}')
                    for i, why in rejected.items()]
         records += self.estimator.update(accepted)
+        self.log.on_look(goal_index, records, self.estimator)     # log before a halt
         self.check_consistency(records)
-        self.log.on_look(goal_index, records, self.estimator)
         return [r.obs.id for r in records if r.action == UPDATE]
 
     def check_consistency(self, records):
@@ -276,10 +300,11 @@ class Navigator:
         move = next_move(pose, goal, self.p,
                          lambda m: not below_min_step(m, self.calib, self.p))
         if move is None and not tag_based and len(searched) < self.p.max_searches:
-            return search_move(pose, landmarks, self.p, searched)
+            move, tag_id = search_move(pose, landmarks, self.p, searched)
+            return calibrated_spin(move, self.p), tag_id
         if move is None:
             return None, None
-        return split_spin(pose, move, landmarks, self.p), None
+        return calibrated_spin(split_spin(pose, move, landmarks, self.p), self.p), None
 
     def result(self, index, goal, reached, tag_based, iters, used, note=''):
         r = WaypointResult(index, goal, reached, tag_based, self.pose(),

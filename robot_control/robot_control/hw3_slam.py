@@ -100,6 +100,7 @@ class Hw3SlamNode(ol_node.MotorNode):
         self.calib = Calibration.for_floor(self.paths['calib_dir'], self.floor)
         self.tags = TagListener(self, self.z_sign)
         self.publisher = SlamPublisher(self)
+        self.sess = None
         print(f'calibration: {self.calib.path}\nslam config: {self.paths["slam_config"]}\n'
               f'detector ids: {sorted(self.ids)} (the filter starts with no landmarks)\n'
               f'options: {self.opts}')
@@ -112,14 +113,18 @@ class Hw3SlamNode(ol_node.MotorNode):
         raw, _ = self.tags.collect(since)
         accepted, rejected = filter_window(raw, self.ids, look_cfg)
         seen = ', '.join(f'{i}@{o.dist:.2f}m' for i, o in sorted(accepted.items()))
-        print(f'  look: {len(raw)} frames, tags [{seen}]'
-              + (f', rejected {rejected}' if rejected else ''))
+        self.say(f'  look: {len(raw)} frames, tags [{seen}]'
+                 + (f', rejected {rejected}' if rejected else ''))
         return accepted, rejected
 
     def execute(self, step):
-        print(f'  {step.describe()}')
+        self.say(f'  {step.describe()}')
         _, timing = self.run_.run_step(step.kind, step.dir, step.cmd, step.T)
         return timing
+
+    def say(self, text):
+        """Print; during a run also into run_<time>/console.txt."""
+        (self.sess.say if self.sess else print)(text)
 
     def session(self):
         return Hw3Session(self.cfg, self.calib, self.look, self.execute, self.opts,
@@ -127,16 +132,18 @@ class Hw3SlamNode(ol_node.MotorNode):
                           {'floor': self.floor, 'tag_z_sign': self.z_sign, **self.paths})
 
     def run(self):
-        s = self.session()
+        self.sess = self.session()
         if self.dry_run:
-            s.dry_run()
+            self.sess.dry_run()
             return
         try:
-            s.run()
+            self.sess.run()
             print('done')
+        except NavigationHalt:
+            pass                # already printed and saved in console.txt
         finally:
-            if s.run_dir:
-                print(f'log: {s.run_dir}')
+            if self.sess.run_dir:
+                print(f'log: {self.sess.run_dir}')
 
 
 def main(args=None):

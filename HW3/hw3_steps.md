@@ -126,6 +126,8 @@ ros2 run robot_control hw3_slam --ros-args -p square_laps:=3 -p octagon_laps:=3
 
 `HALT: ...` = two looks in a row with every known tag gated → check perception / `tag_z_sign`.
 
+The terminal output of `hw3_slam` is also saved to `HW3/logs/run_<time>/console.txt`.
+
 ## 6. Logs and report
 
 Write the measured start of each phase (arena frame, robot centre):
