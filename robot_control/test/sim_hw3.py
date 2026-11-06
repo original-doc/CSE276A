@@ -12,12 +12,13 @@ import numpy as np
 import yaml
 from sim_rover import SimNoise, SimRover, make_calib
 
+from robot_control import map_eval
 from robot_control.ekf import noise_from_config
 from robot_control.estimator import SlamEstimator, init_limits_from_config
 from robot_control.landmark_map import Landmark, LandmarkMap
 from robot_control.nav_log import SlamCsvLog, TeeLog, new_run_dir, write_yaml
 from robot_control.paths import corner_offset, inscribed_octagon_side, make_phases
-from robot_control.se2 import Pose2, compose, wrap_angle
+from robot_control.se2 import Pose2
 from robot_control.slam_run import LapEnd, run_goals, run_phases
 from robot_control.stop_look import Navigator, NavLog, params_from_config
 
@@ -83,13 +84,10 @@ def model_noise():
 
 
 def landmark_errors(snapshot, start, truth):
-    """id -> (position error m, yaw error rad) of the snapshot's landmarks, in the arena."""
-    errs = {}
-    for m in snapshot['landmarks']:
-        p = compose(start, Pose2(m['x'], m['y'], m['yaw']))
-        t = truth.get(m['id'])
-        errs[m['id']] = (math.hypot(p.x - t.x, p.y - t.y), abs(wrap_angle(p.theta - t.yaw)))
-    return errs
+    """truth {id: Landmark} -> id -> (position error m, |yaw error| rad), in the arena."""
+    est = map_eval.poses_to_arena(start, map_eval.snapshot_poses(snapshot))
+    me = map_eval.landmark_errors(est, {i: lm.pose() for i, lm in truth.items()})
+    return {e.id: (e.pos, abs(e.yaw)) for e in me.errors}
 
 
 def mean_sigma(snapshot):
