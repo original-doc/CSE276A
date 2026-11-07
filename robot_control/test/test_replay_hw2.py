@@ -35,7 +35,7 @@ def test_replay_maps_three_tags_without_the_map():
     assert est.ids == [0, 1, 2]
     actions = [(r.obs.id, r.action) for _, recs, _ in history for r in recs or []]
     assert actions[0] == (0, 'init')                            # HW2 gated it; SLAM adds it
-    assert actions.count((1, 'skip_init')) == 2                 # 2.7 m > init_max_dist
+    assert actions.count((1, 'skip_init')) == 0                 # 2.7 m < init_max_dist 2.8
     assert all(a != 'gate' for _, a in actions)
     end = replay_hw2.pose_at(history, 58.81)
     assert math.hypot(end.x, end.y) < 0.1                       # back near the start
