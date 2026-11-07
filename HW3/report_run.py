@@ -306,15 +306,16 @@ def style(ax):
     ax.tick_params(colors=MUTED, labelcolor=INK)
 
 
-TRAJ_LAP_COLORS = [SERIES[7], SERIES[3], SERIES[0]]     # red, yellow, blue: lap 1 -> 3
-LM_LAP_COLORS = ['#f7c59f', '#f29a5c', SERIES[1]]        # light -> full orange: lap 1 -> 3
+LAP_COLORS = [SERIES[7], SERIES[3], SERIES[0]]      # red, yellow, blue: lap 1 -> 3
+# landmark marker area per lap: concentric, shrinking; the last lap is drawn filled
+LM_SIZES = [140, 70, 30]
 
 
-def lap_color(lap, n_laps, palette):
-    """Colour of lap `lap` (1-based) out of n_laps, spread over the palette."""
+def lap_pick(lap, n_laps, values):
+    """Value for lap `lap` (1-based) out of n_laps, spread over `values`."""
     if n_laps <= 1:
-        return palette[-1]
-    return palette[round((lap - 1) * (len(palette) - 1) / (n_laps - 1))]
+        return values[-1]
+    return values[round((lap - 1) * (len(values) - 1) / (n_laps - 1))]
 
 
 def lap_of_rows(phase):
@@ -348,8 +349,7 @@ def plot_map(phase, truth, out_path):
         if idx[0] > 0:
             idx = [idx[0] - 1] + idx
         ax.plot([traj[k].x for k in idx], [traj[k].y for k in idx], '-',
-                color=lap_color(lap, n_laps, TRAJ_LAP_COLORS), lw=2,
-                label=f'trajectory lap {lap}',
+                color=lap_pick(lap, n_laps, LAP_COLORS), lw=2, label=f'trajectory lap {lap}',
                 zorder=2 + lap)
     goals = [map_eval.to_arena(T, Pose2(float(w['goal_x']), float(w['goal_y']), 0.0))
              for w in phase['wps']]
@@ -362,15 +362,16 @@ def plot_map(phase, truth, out_path):
         ax.annotate(f'tag {i}', (t.x, t.y), textcoords='offset points', color=INK,
                     xytext=outward(t), ha='center', va='center', fontsize=9)
     snaps = list(phase['laps'].items())
-    # Map after every lap but the last: hollow circles in that lap's colour.
+    # Map after every lap but the last: concentric hollow circles, shrinking lap by lap,
+    # in the lap's trajectory colour.
     for lap, snap in snaps[:-1]:
         est = map_eval.poses_to_arena(T, map_eval.snapshot_poses(snap))
-        ax.scatter([p.x for p in est.values()], [p.y for p in est.values()], s=40,
-                   facecolors='none', edgecolors=lap_color(lap, n_laps, LM_LAP_COLORS), lw=1.5,
-                   zorder=7,
+        ax.scatter([p.x for p in est.values()], [p.y for p in est.values()],
+                   s=lap_pick(lap, n_laps, LM_SIZES), facecolors='none',
+                   edgecolors=lap_pick(lap, n_laps, LAP_COLORS), lw=1.5, zorder=7,
                    label=f'map after lap {lap}')
     last_lap, final = snaps[-1]
-    fc = lap_color(last_lap, n_laps, LM_LAP_COLORS)
+    fc = lap_pick(last_lap, n_laps, LAP_COLORS)
     est = map_eval.poses_to_arena(T, map_eval.snapshot_poses(final))
     for k, m in enumerate(final['landmarks']):
         p = est[m['id']]
@@ -378,7 +379,7 @@ def plot_map(phase, truth, out_path):
         ax.add_patch(Ellipse((p.x, p.y), 2 * a, 2 * b, angle=math.degrees(ang), fill=False,
                              ec=fc, lw=1.5, zorder=7,
                              label=f'2\u03c3 ellipse after lap {last_lap}' if k == 0 else None))
-        ax.scatter([p.x], [p.y], s=40, color=fc, ec='white', lw=1, zorder=8,
+        ax.scatter([p.x], [p.y], s=lap_pick(last_lap, n_laps, LM_SIZES), color=fc, zorder=8,
                    label=f'map after lap {last_lap} (final)' if k == 0 else None)
         arrow(ax, p, 0.15, color=fc)
     ax.set_aspect('equal')
