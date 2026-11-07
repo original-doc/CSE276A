@@ -38,6 +38,7 @@ setup(
             'hw2_probe = robot_control.hw2_probe:main',
             'hw2_nav = robot_control.hw2_nav:main',
             'hw3_slam = robot_control.hw3_slam:main',
+            'fit_spin_pulse = robot_control.fit_spin_pulse:main',
         ],
     },
 )

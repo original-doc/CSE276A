@@ -1,7 +1,8 @@
-"""Fit the coarse spin level as single pulses from closed-loop run logs (Mac, no ROS).
+"""Fit the coarse spin level as single pulses from closed-loop run logs (no ROS).
 
-    ~/anaconda3/bin/python HW3/fit_spin_pulse.py [HW3/logs/run_*] [--cmd 0.35] [--min-T 0.1]
+    python3 -m robot_control.fit_spin_pulse [HW3/logs/run_*] [--cmd 0.35] [--min-T 0.1]
         [--calib robot_control/config/open_loop/study_wood2_hw2_ext.yaml] [--write]
+    ros2 run robot_control fit_spin_pulse ...        (on the robot, same arguments)
 
 Every spin step in steps.csv that was followed by a tag correction gives one sample:
 actual angle = planned angle + heading correction at the next look, against the
@@ -15,17 +16,14 @@ import argparse
 import csv
 import glob
 import os
-import sys
 from pathlib import Path
 
 import numpy as np
 
-ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT / 'robot_control'))
+from robot_control.ol_model import DIRS, Calibration, PulseModel
 
-from robot_control.ol_model import DIRS, Calibration, PulseModel  # noqa: E402
-
-DEFAULT_CALIB = ROOT / 'robot_control' / 'config' / 'open_loop' / 'study_wood2_hw2_ext.yaml'
+REPO = Path(__file__).resolve().parents[2]      # .../CSE276A (source checkout)
+DEFAULT_CALIB = REPO / 'robot_control' / 'config' / 'open_loop' / 'study_wood2_hw2_ext.yaml'
 MOTION_S = 0.05      # s of actual turning the shortest pulse must contain
 
 
@@ -84,15 +82,15 @@ def report(d, cmd, pts, pm, calib):
     return lines
 
 
-def main():
+def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
     ap.add_argument('runs', nargs='*', help='run dirs or globs (default HW3/logs/run_*)')
     ap.add_argument('--cmd', type=float, default=0.35)
     ap.add_argument('--min-T', type=float, default=0.1, dest='min_T')
     ap.add_argument('--calib', default=str(DEFAULT_CALIB))
     ap.add_argument('--write', action='store_true', help='store the models in --calib')
-    a = ap.parse_args()
-    runs = a.runs or [str(ROOT / 'HW3' / 'logs' / 'run_*')]
+    a = ap.parse_args(argv)
+    runs = a.runs or [str(REPO / 'HW3' / 'logs' / 'run_*')]
     files = sorted(f for pat in runs for f in glob.glob(os.path.join(pat, '*', 'steps.csv'))
                    + glob.glob(os.path.join(pat, 'steps.csv')))
     if not files:

@@ -83,7 +83,7 @@ def make_calib(tmp_path):
     """Coarse levels like study_wood2, plus fine levels (min 1.5 cm / 3 deg).
 
     The coarse spin level also carries a pulse model (like study_wood2_hw2_ext after
-    HW3/fit_spin_pulse.py), so HW3's single-level spin config can turn from ~6.5 deg.
+    robot_control/fit_spin_pulse.py), so HW3's single-level spin config can turn from ~6.5 deg.
     """
     c = Calibration.load(tmp_path / 'sim.yaml', 'sim', create=True)
     for T in (2.0, 3.0, 4.0):

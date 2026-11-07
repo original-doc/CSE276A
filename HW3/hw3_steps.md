@@ -130,7 +130,8 @@ Spins use one level (`cmd 0.35`) timed by a **pulse model** in the calibration f
 (`spin: <dir>: pulse: {0.35: {rate, offset, min_T, ...}}`, deg = rate × T + offset on the
 commanded T), fitted from the heading corrections in run logs. Re-fit after new runs (Mac):
 ```bash
-python HW3/fit_spin_pulse.py --write        # all HW3/logs/run_*; or name run dirs
+cd robot_control && python3 -m robot_control.fit_spin_pulse --write   # all HW3/logs/run_*; or name run dirs
+# on the robot: ros2 run robot_control fit_spin_pulse --write
 ```
 The smallest pulse (`min_T`) is 7–9°; residual turns below it are dropped (`tolerance.ang_deg`).
 

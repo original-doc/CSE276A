@@ -7,7 +7,7 @@ Fits are always recomputed from the raw trials in config/open_loop/<floor>.yaml.
 
 A spin level may instead carry a `pulse` model (spin: <dir>: pulse: {<cmd>: {...}}):
 the same line a = rate * T + offset, but on the COMMANDED T, fitted from the heading
-corrections of closed-loop runs (HW3/fit_spin_pulse.py) and valid down to `min_T`.
+corrections of closed-loop runs (robot_control/fit_spin_pulse.py) and valid down to `min_T`.
 It replaces the trial fit and `time_scale` for that level, so one coarse level covers
 every turn from a few degrees up (no gap between a fine and a coarse level).
 """
