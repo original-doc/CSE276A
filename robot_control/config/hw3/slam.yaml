@@ -39,7 +39,7 @@ control:
   near_turn_deg: 45.0   #   (go straight to the vertex heading instead)
 
 slam:                   # a new tag is added only from an observation this close and frontal
-  init_max_dist: 2.5
+  init_max_dist: 2.8   # 2.5 left tag 3 unmapped in run 232544 (seen 6x at 2.53-2.66 m from vertex 1)
   init_max_oblique_deg: 45.0
 
 ekf:
