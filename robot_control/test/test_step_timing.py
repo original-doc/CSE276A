@@ -1,7 +1,7 @@
 import pytest
 
-from robot_control.ol_model import Calibration
-from robot_control.step_timing import min_amount, min_step, pick_level
+from robot_control.ol_model import Calibration, PulseModel
+from robot_control.step_timing import level_fit, min_amount, min_step, pick_level
 
 LEVELS = (0.3, 0.2)
 SPIN = (0.35, 0.25)
@@ -71,3 +71,26 @@ def test_min_amount_respects_time_scale(tmp_path):
 def test_min_step(tmp_path):
     assert min_step(make_calib(tmp_path), 'drive', 'fwd', LEVELS) == pytest.approx(0.015)
     assert min_step(make_calib(tmp_path, fine=False), 'spin', 'cw', SPIN) is None
+
+
+def test_pulse_model_times_the_coarse_spin_level(tmp_path):
+    c = make_calib(tmp_path, fine=False)
+    c.data['spin']['ccw']['time_scale'] = 0.8           # ignored once a pulse model exists
+    c.set_pulse('ccw', 0.35, PulseModel(136.9, -6.3, 0.1, 0.25, 0.86))
+    assert level_fit(c, 'spin', 'ccw', 0.35).rate == pytest.approx(136.9)
+    assert min_amount(c, 'spin', 'ccw', 0.35) == pytest.approx(136.9 * 0.1 - 6.3)
+    assert min_step(c, 'spin', 'ccw', (0.35,)) == pytest.approx(136.9 * 0.1 - 6.3)
+    s = pick_level(c, 'spin', 'ccw', 9.0, (0.35,))        # was: no level below ~45 deg
+    assert s.cmd == 0.35 and s.T == pytest.approx((9.0 + 6.3) / 136.9)
+    assert 'outside fitted' in s.warn                    # 0.11 s < 0.25 s - 20 %
+    s = pick_level(c, 'spin', 'ccw', 45.0, (0.35,))
+    assert s.T == pytest.approx((45.0 + 6.3) / 136.9) and s.warn is None
+    assert pick_level(c, 'spin', 'ccw', 5.0, (0.35,)).T is None
+    assert min_step(c, 'spin', 'cw', (0.35,)) is None    # cw has neither trials nor a pulse
+
+
+def test_pulse_model_wins_over_a_fine_level_only_when_in_range(tmp_path):
+    c = make_calib(tmp_path)
+    c.set_pulse('ccw', 0.35, PulseModel(125.0, -6.0, 0.1, 0.4, 1.6))
+    assert pick_level(c, 'spin', 'ccw', 10.0, SPIN).cmd == 0.25    # 0.13 s: 'short' -> fine
+    assert pick_level(c, 'spin', 'ccw', 40.0, SPIN).cmd == 0.35    # 0.37 s: 'ok'

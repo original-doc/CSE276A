@@ -2,7 +2,7 @@
 import math
 from dataclasses import dataclass
 
-from robot_control.ol_model import Calibration
+from robot_control.ol_model import Calibration, PulseModel
 from robot_control.se2 import Pose2, angle_between, to_child, wrap_angle
 from robot_control.tag_obs import make_obs
 
@@ -80,7 +80,11 @@ class SimRover:
 
 
 def make_calib(tmp_path):
-    """Coarse levels like study_wood2, plus fine levels (min 1.5 cm / 3 deg)."""
+    """Coarse levels like study_wood2, plus fine levels (min 1.5 cm / 3 deg).
+
+    The coarse spin level also carries a pulse model (like study_wood2_hw2_ext after
+    robot_control/fit_spin_pulse.py), so HW3's single-level spin config can turn from ~6.5 deg.
+    """
     c = Calibration.load(tmp_path / 'sim.yaml', 'sim', create=True)
     for T in (2.0, 3.0, 4.0):
         c.drive_trials().append({'cmd': 0.3, 'T': T, 'x': 0.396 * T - 0.024, 'y': 0.0})
@@ -91,4 +95,5 @@ def make_calib(tmp_path):
             c.spin_trials(d).append({'cmd': 0.35, 'T': T, 'angle': 125.0 * T - 6.0})
         for T in (0.2, 0.4, 0.6):
             c.spin_trials(d).append({'cmd': 0.25, 'T': T, 'angle': 20.0 * T - 1.0})
+        c.set_pulse(d, 0.35, PulseModel(125.0, -6.0, 0.1, 0.4, 1.6))   # 'short' below 0.32 s
     return c

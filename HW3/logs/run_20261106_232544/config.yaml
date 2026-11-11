@@ -1,0 +1,24 @@
+floor: study_wood2_hw2_ext
+tag_z_sign: 1
+calib_dir: /home/ubuntu/ros2_ws/src/CSE276A/robot_control/config/open_loop
+slam_config: /home/ubuntu/ros2_ws/src/CSE276A/robot_control/config/hw3/slam.yaml
+options: {square_size: 1.5, square_laps: 3, octagon_laps: 3, reset: true, phase_pause_s: 30.0,
+  wp_pause_s: 1.0, countdown_s: 3, dry_looks: 3}
+slam:
+  detector_ids: [0, 1, 2, 3, 4, 5, 6, 7]
+  tolerance: {pos: 0.05, ang_deg: 8.0}
+  levels:
+    drive: [0.3, 0.2]
+    spin: [0.35]
+  look: {window_s: 1.0, min_count: 3, max_spread: 0.02, min_dist: 0.25, max_dist: 3.0,
+    max_oblique_deg: 60.0}
+  control: {max_iters: 15, max_searches: 2, search_max_dist: 2.5, align_min_deg: 8.0,
+    align_max_deg: 15.0, view_half_deg: 35.0, max_drive: 0.75, undershoot_k: 0.03,
+    undershoot_c: 0.08, undershoot_min: 0.3, min_split_deg: 45.0, fine_max_deg: 0.0,
+    coarse_min_deg: 0.0, near_dist: 0.3, near_turn_deg: 45.0}
+  slam: {init_max_dist: 2.5, init_max_oblique_deg: 45.0}
+  ekf:
+    init_sigma: {xy: 0.0, theta_deg: 0.0}
+    motion: {k_d: 0.2, c_d: 0.01, k_lat: 0.03, k_hd_deg: 6.0, k_s: 0.15, c_s_deg: 6.0}
+    obs: {a: 0.005, b: 0.01, c_deg: 1.5, e_deg: 1.5, oblique_deg: 30.0, oblique_factor: 2.0}
+    gate: 11.34

@@ -4,11 +4,13 @@ detector_ids: [0, 1, 2, 3, 4, 5, 6, 7]   # ids the look accepts (= apriltag conf
 
 tolerance:              # HW3 scores the map, not waypoint accuracy: looser than HW2
   pos: 0.05
-  ang_deg: 5.0
+  ang_deg: 8.0          # HW2 3: the smallest coarse pulse is 7-9 deg, so a smaller residual stays
 
 levels:
   drive: [0.3, 0.2]
-  spin: [0.35, 0.25]
+  spin: [0.35]          # HW2 [0.35, 0.25]: the fine 0.25 level turned 0.5-3x the plan on 2026-11-06;
+                        #   0.35 covers every turn from ~8 deg as a single pulse (pulse model in the
+                        #   calibration file, fitted by HW3/fit_spin_pulse.py from the run logs)
 
 look:
   window_s: 1.0
@@ -22,7 +24,7 @@ control:
   max_iters: 15
   max_searches: 2
   search_max_dist: 2.5
-  align_min_deg: 3.0
+  align_min_deg: 8.0    # HW2 3: no point asking for alignment finer than the smallest pulse
   align_max_deg: 15.0
   view_half_deg: 35.0
   max_drive: 0.75       # HW2 1.2: a square side is split in two, one more look in between
@@ -30,15 +32,14 @@ control:
   undershoot_c: 0.08
   undershoot_min: 0.3
   min_split_deg: 45.0   # HW2 15: split a turn (to keep a tag in view) only if both parts >= this
-  fine_max_deg: 7.0     # HW2 20: fine spin 0.25 only up to T ~0.32 s; longer fine spins turned
-                        #   1.5-2.4x the plan on 2026-11-06 (e.g. 10.7 deg -> 25.6 deg)
-  coarse_min_deg: 25.0  # coarse spin 0.35 from T 0.2 s (~25 deg) turned 0.7-1.0x the plan; turns
-                        #   between fine_max and this are done as equal fine turns <= fine_max
+  fine_max_deg: 0.0     # fine/coarse split off (HW2 20, then 7): one spin level, no gap to bridge
+  coarse_min_deg: 0.0   #   (keep both 0; with a fine level, turns in (fine_max, coarse_min) are
+                        #   split into equal fine turns, never smaller than the smallest step)
   near_dist: 0.3        # m (was 0.15): this close to a vertex, an aligning turn > near_turn_deg is skipped
   near_turn_deg: 45.0   #   (go straight to the vertex heading instead)
 
 slam:                   # a new tag is added only from an observation this close and frontal
-  init_max_dist: 2.5
+  init_max_dist: 2.8   # 2.5 left tag 3 unmapped in run 232544 (seen 6x at 2.53-2.66 m from vertex 1)
   init_max_oblique_deg: 45.0
 
 ekf:

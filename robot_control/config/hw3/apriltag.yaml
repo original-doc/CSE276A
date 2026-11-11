@@ -3,7 +3,7 @@
   ros__parameters:
     image_transport: raw
     family: 36h11
-    size: 0.166
+    size: 0.156   # printed black square; 0.166 in the PDF came out ~6 % smaller (ranges were 1.06x long, 2026-11-06)
     max_hamming: 0
     detector:
       threads: 2
@@ -16,4 +16,4 @@
     tag:
       ids: [0, 1, 2, 3, 4, 5, 6, 7]
       frames: [tag_0, tag_1, tag_2, tag_3, tag_4, tag_5, tag_6, tag_7]
-      sizes: [0.166, 0.166, 0.166, 0.166, 0.166, 0.166, 0.166, 0.166]
+      sizes: [0.156, 0.156, 0.156, 0.156, 0.156, 0.156, 0.156, 0.156]

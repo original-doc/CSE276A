@@ -16,6 +16,11 @@ def level_section(calib, kind, direction):
 
 
 def level_fit(calib, kind, direction, cmd):
+    """Line (rate, offset, t_min, t_max) the level is timed with: a spin's pulse model if any."""
+    if kind == 'spin':
+        pm = calib.pulse(direction, cmd)
+        if pm is not None:
+            return pm
     fits = calib.drive_fits() if kind == 'drive' else calib.spin_fits(direction)
     return fit_for(fits, cmd)
 
@@ -64,6 +69,10 @@ def pick_level(calib, kind, direction, amount, levels):
 
 def min_amount(calib, kind, direction, cmd):
     """Smallest move one level can make (run for its min_T); raises ModelError."""
+    if kind == 'spin':
+        pm = calib.pulse(direction, cmd)
+        if pm is not None:
+            return pm.min_deg
     fit = level_fit(calib, kind, direction, cmd)
     section = level_section(calib, kind, direction)
     min_T = calib.min_T(section, cmd)

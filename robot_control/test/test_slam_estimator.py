@@ -34,7 +34,7 @@ def look(*obs):
 
 
 def test_config_loads():
-    assert LIMITS.max_dist == 2.5 and LIMITS.max_oblique == pytest.approx(math.radians(45))
+    assert LIMITS.max_dist == 2.8 and LIMITS.max_oblique == pytest.approx(math.radians(45))
     assert P.max_drive == 0.75 and P.pos_tol == 0.05
     assert CFG['detector_ids'] == list(range(8))
 
@@ -82,13 +82,13 @@ def test_known_tags_update_before_new_tags_are_added():
 def test_init_limits_skip_far_and_oblique_tags():
     est = SlamEstimator(NOISE, LIMITS)
     start = Pose2(0.0, 0.0, 0.0)
-    far = obs_of(start, Pose2(2.7, 0.0, math.pi), 3)
+    far = obs_of(start, Pose2(3.0, 0.0, math.pi), 3)            # > init_max_dist 2.8
     oblique = obs_of(start, Pose2(1.0, 0.0, math.radians(130)), 4)    # 50 deg off
     records = {r.obs.id: r for r in est.update(look(far, oblique))}
     assert records[3].action == SKIP_INIT and 'dist' in records[3].reason
     assert records[4].action == SKIP_INIT and 'oblique' in records[4].reason
     assert est.ids == [] and len(est.s) == 3
-    near = obs_of(start, Pose2(2.4, 0.0, math.pi), 3)
+    near = obs_of(start, Pose2(2.7, 0.0, math.pi), 3)
     assert [r.action for r in est.update(look(near))] == [INIT]
     assert est.ids == [3]
 

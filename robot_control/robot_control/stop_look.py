@@ -109,16 +109,31 @@ def near_skip(dist, bearing, p):
     return dist <= p.near_dist and abs(bearing) > p.near_turn
 
 
-def calibrated_spin(move, p):
+def calibrated_spin(move, p, calib=None):
     """Split a spin between the fine and coarse calibrated ranges into equal fine turns.
 
-    Returns the first piece; the rest is re-planned after the next look.
+    Returns the first piece; the rest is re-planned after the next look. With a
+    calibration, no piece is smaller than the smallest spin it can make (run
+    2026-11-06 091125: 9.1 deg split into 2 x 4.54 deg, 0.01 deg below the smallest
+    step, and the start vertex was declared reached 0.5 m away).
     """
     a = abs(move.value) if move is not None and move.kind == 'spin' else 0.0
     if not (p.fine_max < a < p.coarse_min):
         return move
     pieces = math.ceil(a / p.fine_max)
+    if calib is not None:
+        _, direction, _ = move_to_primitive(move)
+        smallest = min_step(calib, 'spin', direction, p.spin_levels)
+        while smallest is not None and pieces > 1 and math.degrees(a / pieces) < smallest:
+            pieces -= 1
     return Move('spin', move.value / pieces)
+
+
+def position_done(pose, goal, p):
+    """The position part of a goal is over: at the vertex, or beside it (near_skip)."""
+    dx, dy = goal.x - pose.x, goal.y - pose.y
+    dist = math.hypot(dx, dy)
+    return dist <= p.pos_tol or near_skip(dist, wrap_angle(math.atan2(dy, dx) - pose.theta), p)
 
 
 def tag_oblique_from(pose, lm):
@@ -304,7 +319,8 @@ class Navigator:
             return calibrated_spin(move, self.p), tag_id
         if move is None:
             return None, None
-        return calibrated_spin(split_spin(pose, move, landmarks, self.p), self.p), None
+        return calibrated_spin(split_spin(pose, move, landmarks, self.p), self.p,
+                               self.calib), None
 
     def result(self, index, goal, reached, tag_based, iters, used, note=''):
         r = WaypointResult(index, goal, reached, tag_based, self.pose(),
@@ -321,7 +337,10 @@ class Navigator:
                 note = '' if used else 'no tag seen; reached by prediction only'
                 return self.result(index, goal, True, bool(used), it, used, note)
             if below_min_step(move, self.calib, self.p):
-                return self.result(index, goal, True, bool(used), it, used,
+                # Only the final heading turn may end a goal this way; a too-small
+                # aligning turn far from the vertex is a planning gap, not an arrival.
+                return self.result(index, goal, position_done(self.pose(), goal, self.p),
+                                   bool(used), it, used,
                                    f'remaining {move.kind} is below the smallest step')
             if self.act(index, move) is None:
                 return self.result(index, goal, False, bool(used), it, used,

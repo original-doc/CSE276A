@@ -36,6 +36,9 @@ spin:
     - {cmd: 0.25, T: 0.4, angle: 9.0, time: '2026-10-24T05:08:37'}
     - {cmd: 0.25, T: 0.6, angle: 11.0, time: '2026-10-24T05:08:43'}
     - {cmd: 0.25, T: 0.2, angle: 5.0, time: '2026-10-24T05:08:53'}
+    pulse:
+      0.35: {rate: 153.7353, offset: -8.1723, min_T: 0.1032, t_min: 0.241, t_max: 0.74,
+        rms: 5.2608, n: 96}
   cw:
     time_scale: 0.77
     min_T: {0.25: 0.1}
@@ -63,6 +66,9 @@ spin:
     - {cmd: 0.25, T: 0.1, angle: 4.0, time: '2026-10-24T05:09:00'}
     - {cmd: 0.25, T: 0.6, angle: 13.0, time: '2026-10-24T05:09:07'}
     - {cmd: 0.25, T: 0.1, angle: 2.0, time: '2026-10-24T05:09:11'}
+    pulse:
+      0.35: {rate: 177.3897, offset: -17.522, min_T: 0.1488, t_min: 0.222, t_max: 0.579,
+        rms: 2.3853, n: 7}
 verify:
 - {kind: drive, dir: fwd, target: 1.0, cmd: 0.3, T: 2.587, trim: 0.0, x: 0.995, y: 0.016,
   time: '2026-10-15T06:04:58'}
@@ -74,7 +80,7 @@ verify:
   time: '2026-10-15T06:07:25'}
 - {kind: spin, dir: ccw, target: 180.0, cmd: 0.35, T: 1.487, trim: 0.0, angle: 176.0,
   time: '2026-10-15T06:08:02'}
-updated: '2026-10-24'
+updated: '2026-11-06'
 fit:
   drive:
     0.3: {rate: 0.3958, offset: -0.0242, rms: 0.0123, n: 6, n_durations: 3, t_min: 2.0,
