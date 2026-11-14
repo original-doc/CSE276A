@@ -155,3 +155,6 @@ python HW3/report_run.py HW3/logs/run_<time>     # no argument = newest run
 ```
 Outputs: `run_<time>/report.md`; per phase `map.png`, `sigma.png`, `report.md`.
 
+Ground-truth map figure: `python HW3/make_truth_map.py` writes
+`HW3/figures/hw3_truth_map.png` and `.pdf`.
+

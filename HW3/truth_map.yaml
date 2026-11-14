@@ -1,9 +1,9 @@
 # HW3 ground truth (tape measure), arena frame: origin = arena bottom-left corner,
 # x along the bottom edge, y along the left edge. Measure every tag centre from
-# the same corner; yaw_deg = direction of the tag's outward normal.
+# the same corner; yaw_deg = direction of the tag face normal (into the arena).
 # Nominal values below: replace with the measured ones (E2). NOT given to the filter.
 frame: arena
-tag_size: 0.156   # measured by range tests 2026-11-06 (printed ~6 % smaller than the 0.166 PDF)
+tag_size: 0.156   # effective PnP side, compensates ~6 % camera range-scale bias; physical printed side is 0.166 m
 landmarks:
   - {id: 0, x: 1.0, y: 0.0, yaw_deg: 90}
   - {id: 1, x: 2.0, y: 0.0, yaw_deg: 90}
