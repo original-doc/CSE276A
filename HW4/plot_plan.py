@@ -2,8 +2,10 @@
 """HW4 planning figures (report 3(c)): runs both planners on world.yaml and saves PNGs.
 
   python HW4/plot_plan.py [--world robot_control/config/hw4/world.yaml] [--out HW4/figures]
+  python HW4/plot_plan.py --run HW4/logs/run_<time>_<planner>   # the plan a run used
 
 Figures: plan_safe.png, plan_fast.png, plan_compare.png, expand_safe.png, expand_fast.png
+(--run: plan_<planner>.png and expand_<planner>.png in <run>/figures/)
 """
 import argparse
 import os
@@ -12,6 +14,7 @@ from pathlib import Path
 
 import matplotlib
 import numpy as np
+import yaml
 
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt  # noqa: E402
@@ -21,9 +24,11 @@ from matplotlib.patches import Rectangle  # noqa: E402
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'robot_control'))
 
+from robot_control.grid import Grid  # noqa: E402
+from robot_control.path_utils import make_plan  # noqa: E402
 from robot_control.plan_fast import plan_fast  # noqa: E402
 from robot_control.plan_safe import plan_safe  # noqa: E402
-from robot_control.world import load_world, segment_rect_dist  # noqa: E402
+from robot_control.world import load_world, parse_world, segment_rect_dist  # noqa: E402
 
 DEFAULT_WORLD = ROOT / 'robot_control' / 'config' / 'hw4' / 'world.yaml'
 DEFAULT_OUT = ROOT / 'HW4' / 'figures'
@@ -236,12 +241,52 @@ def make_figures(world, cfg, out_dir):
     return paths, safe, fast
 
 
+def load_run_plan(run_dir):
+    """(world, Plan) from a run's config.yaml, plan.yaml and plan.npz (first plan)."""
+    run_dir = Path(run_dir)
+    with open(run_dir / 'config.yaml') as f:
+        world = parse_world(yaml.safe_load(f)['world'])
+    with open(run_dir / 'plan.yaml') as f:
+        rec = yaml.safe_load(f)
+    npz = np.load(run_dir / 'plan.npz')
+    if rec['planner'] == 'safe':
+        res, nx, ny, ox, oy = npz['grid']
+        extra = {'grid': Grid(float(res), int(nx), int(ny), float(ox), float(oy)),
+                 'D': npz['D'], 'label': npz['label'], 'gvd': npz['gvd'],
+                 'expanded': [tuple(c) for c in npz['expanded']]}
+    else:
+        extra = {'vertices': [tuple(v) for v in npz['vertices']],
+                 'edges': [tuple(e) for e in npz['edges']],
+                 'expanded': list(npz['expanded'])}
+    return world, make_plan(rec['planner'], rec['points'], world, rec['stats'], extra)
+
+
+def run_figures(run_dir, out_dir=None):
+    world, plan = load_run_plan(run_dir)
+    out_dir = Path(out_dir or Path(run_dir) / 'figures')
+    out_dir.mkdir(parents=True, exist_ok=True)
+    draw = {'safe': (fig_safe, fig_expand_safe), 'fast': (fig_fast, fig_expand_fast)}
+    paths = []
+    for name, fn in zip(('plan', 'expand'), draw[plan.kind]):
+        fig = fn(plan, world)
+        fig.tight_layout()
+        paths.append(out_dir / f'{name}_{plan.kind}.png')
+        fig.savefig(paths[-1], dpi=150)
+        plt.close(fig)
+    return paths
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument('--world', default=str(DEFAULT_WORLD))
     ap.add_argument('--out', default=str(DEFAULT_OUT))
     ap.add_argument('--tie-side', default=DEFAULT_CFG['tie_side'], choices=['right', 'left'])
+    ap.add_argument('--run', help='redraw the plan of this run directory instead')
     args = ap.parse_args(argv)
+    if args.run:
+        for p in run_figures(args.run, None if args.out == str(DEFAULT_OUT) else args.out):
+            print('saved', os.path.relpath(p))
+        return
     cfg = dict(DEFAULT_CFG, tie_side=args.tie_side)
     paths, safe, fast = make_figures(load_world(args.world), cfg, args.out)
     for plan in (safe, fast):

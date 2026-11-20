@@ -10,6 +10,10 @@ HW3 (SlamCsvLog, one <dir> per phase: run_<time>/square, run_<time>/octagon) add
 <dir>/landmarks.csv     every landmark in the state after every look
 <dir>/map_lap<k>.yaml   map and observation counts at the end of lap k
 <dir>/final_state.npz   full s, Sigma, ids at the end
+
+HW4 (plan_run.PlanSession) adds
+<dir>/plan.yaml         planner, polyline, waypoints, length, clearance, stats, replans
+<dir>/plan.npz          planner data for plots (safe: D, label, gvd; fast: vertices, edges)
 """
 import csv
 import math
@@ -248,3 +252,37 @@ class TeeLog(NavLog):
     def on_waypoint(self, *args):
         for log in self.logs:
             log.on_waypoint(*args)
+
+
+# ---------- HW4 plans ----------
+
+def plan_record(plan, goals=None):
+    """Plan (+ its Navigator goals) -> yaml-friendly dict."""
+    rec = {
+        'planner': plan.kind,
+        'length': round(plan.length, 4),
+        'min_clearance': round(plan.min_clearance, 4),
+        'points': [[round(x, 4), round(y, 4)] for x, y in plan.points],
+        'stats': {k: (round(v, 6) if isinstance(v, float) else v)
+                  for k, v in plan.stats.items()},
+    }
+    if goals is not None:
+        rec['waypoints'] = [[round(g.x, 4), round(g.y, 4), round(math.degrees(g.theta), 2)]
+                            for g in goals]
+    return rec
+
+
+def write_plan_npz(path, plan):
+    """Arrays plot_plan.py needs to redraw the planner's representation."""
+    e = plan.extra
+    data = {'kind': plan.kind, 'points': np.array(plan.points)}
+    if plan.kind == 'safe':
+        g = e['grid']
+        data.update(D=e['D'], label=e['label'], gvd=e['gvd'],
+                    grid=np.array([g.res, g.nx, g.ny, g.ox, g.oy]),
+                    expanded=np.array(e['expanded'], dtype=int).reshape(-1, 2))
+    else:
+        data.update(vertices=np.array(e['vertices']),
+                    edges=np.array(e['edges'], dtype=int).reshape(-1, 2),
+                    expanded=np.array(e['expanded'], dtype=int))
+    np.savez(path, **data)

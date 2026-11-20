@@ -21,3 +21,15 @@ def test_box_clearance():
     world = plot_plan.load_world(plot_plan.DEFAULT_WORLD)
     fast = plot_plan.plan_fast(world)
     assert plot_plan.box_clearance(fast, world) == pytest.approx(fast.min_clearance)
+
+
+@pytest.mark.parametrize('kind', ['safe', 'fast'])
+def test_redraw_from_run(tmp_path, kind):
+    from test_plan_run import Rig
+    s = Rig(tmp_path, kind).session.run()
+    world, plan = plot_plan.load_run_plan(s.run_dir)
+    assert plan.kind == kind
+    assert plan.length == pytest.approx(s.plans[0].length, abs=1e-3)
+    plot_plan.main(['--run', s.run_dir])
+    for name in (f'plan_{kind}.png', f'expand_{kind}.png'):
+        assert os.path.getsize(os.path.join(s.run_dir, 'figures', name)) > 10_000
