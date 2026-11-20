@@ -10,3 +10,7 @@ Instructor: Shapely is too much automation as you in reality will do close to no
 
 Student: Hi Professor, I noticed that LM1–LM4 appear both on the boundary and on the obstacle in the HW4 figure. Are these just illustrative labels? Should we use a unique AprilTag ID for each physical landmark? Thanks!
 Instructor: Just think of them as illustrative. You have all of them as unique or a creative mixture of a limited set of both options are ok
+
+Student: Implementing A* from scratch, or use existing library?
+In previous homework assignments we were allowed to use existing libraries; for HW4 are we allowed to use something like astar as an A* implementation, or are we to write it from scratch?
+Instructor: No need to implement A* yourself.
