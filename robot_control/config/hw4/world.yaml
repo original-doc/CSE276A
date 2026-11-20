@@ -1,0 +1,22 @@
+# HW4 world, frame = arena (bottom-left corner origin). All sizes in m, angles in deg.
+arena: {x0: 0.0, y0: 0.0, x1: 3.0, y1: 3.0}
+obstacles:
+  - {cx: 1.5, cy: 1.5, w: 0.35, h: 0.35}   # measure the real box and update
+robot: {length: 0.194, width: 0.168, extra: 0.0}   # extra: camera mount etc.
+margins: {r_margin: 0.08, guard_margin: 0.03}
+start: {x: 0.5, y: 2.5, theta_deg: -45.0}  # measured before each run
+goal: {x: 2.5, y: 0.5}
+tag_size: 0.156   # measured by range tests 2026-11-06 (printed 0.166)
+landmarks:        # yaw_deg = outward normal; walls as in HW3, obstacle faces 8-11
+  - {id: 0, x: 1.0, y: 0.0, yaw_deg: 90}
+  - {id: 1, x: 2.0, y: 0.0, yaw_deg: 90}
+  - {id: 2, x: 3.0, y: 1.0, yaw_deg: 180}
+  - {id: 3, x: 3.0, y: 2.0, yaw_deg: 180}
+  - {id: 4, x: 2.0, y: 3.0, yaw_deg: -90}
+  - {id: 5, x: 1.0, y: 3.0, yaw_deg: -90}
+  - {id: 6, x: 0.0, y: 2.0, yaw_deg: 0}
+  - {id: 7, x: 0.0, y: 1.0, yaw_deg: 0}
+  - {id: 8, x: 1.5, y: 1.325, yaw_deg: -90}
+  - {id: 9, x: 1.675, y: 1.5, yaw_deg: 0}
+  - {id: 10, x: 1.5, y: 1.675, yaw_deg: 90}
+  - {id: 11, x: 1.325, y: 1.5, yaw_deg: 180}
