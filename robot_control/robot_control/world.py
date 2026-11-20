@@ -146,6 +146,11 @@ def segment_rect_dist(a, b, rect):
     return min(d, *(point_segment_dist(c, a, b) for c in rect.corners()))
 
 
+def side_of(p, a, b):
+    """> 0 if p is left of the ray a -> b, < 0 if right."""
+    return (b[0] - a[0]) * (p[1] - a[1]) - (b[1] - a[1]) * (p[0] - a[0])
+
+
 def wall_dist(p, arena):
     """Distance from p to the arena boundary (0 outside the arena)."""
     d = min(p[0] - arena.x0, arena.x1 - p[0], p[1] - arena.y0, arena.y1 - p[1])

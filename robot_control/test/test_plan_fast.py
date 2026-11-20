@@ -7,9 +7,9 @@ import pytest
 import yaml
 
 from robot_control.path_utils import NoPath, path_length
-from robot_control.plan_fast import (
-    graph_vertices, plan_fast, side_of, visibility_graph, visible)
-from robot_control.world import load_world, parse_world, segment_clearance, segment_enters_rect
+from robot_control.plan_fast import graph_vertices, plan_fast, visibility_graph, visible
+from robot_control.world import (
+    load_world, parse_world, segment_clearance, segment_enters_rect, side_of)
 
 CONFIG = os.path.join(os.path.dirname(__file__), '..', 'config', 'hw4', 'world.yaml')
 WORLD = load_world(CONFIG)

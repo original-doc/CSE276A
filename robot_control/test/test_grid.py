@@ -159,3 +159,12 @@ def test_other_layouts(obstacles):
     err = np.array([D[c] - clearance(grid.cell_center(*c), w) for c in zip(*np.nonzero(free))])
     # < 1 cell; slightly above the truth (< RES / 4) only diagonal to a box corner
     assert err.min() > -RES and err.max() < RES / 4
+
+
+def test_gvd_mirror_symmetric_off_the_diagonal(field):
+    # The default layout is symmetric about x + y = 3 (S-G line): (i, j) <-> (151 - j, 151 - i).
+    grid, _, _, _, gvd = field
+    mirror = gvd[::-1, ::-1].T
+    for i, j in np.argwhere(gvd != mirror):
+        x, y = grid.cell_center(i, j)
+        assert abs(x + y - 3.0) / np.sqrt(2) < 0.05

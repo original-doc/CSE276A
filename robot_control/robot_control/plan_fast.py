@@ -9,14 +9,9 @@ import time
 
 from robot_control.graph_search import dijkstra
 from robot_control.path_utils import make_plan, NoPath
-from robot_control.world import segment_enters_rect, wall_dist
+from robot_control.world import segment_enters_rect, side_of, wall_dist
 
 EPS = 1e-9
-
-
-def side_of(p, a, b):
-    """> 0 if p is left of the ray a -> b, < 0 if right."""
-    return (b[0] - a[0]) * (p[1] - a[1]) - (b[1] - a[1]) * (p[0] - a[0])
 
 
 def is_free(p, world, r):

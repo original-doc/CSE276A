@@ -70,6 +70,8 @@ def brushfire(grid, labels):
     Propagates the distance to the nearest obstacle cell center, then subtracts half
     a cell (that center lies about half a cell inside the obstacle). D is within one
     cell of the true clearance, and mostly below it. Returns (D, label); D = 0 on obstacles.
+    Exact ties go to the smaller label, so the result does not depend on queue order
+    (keeps mirror-symmetric layouts symmetric).
     """
     D = np.full(labels.shape, np.inf)
     src = {}
@@ -90,7 +92,8 @@ def brushfire(grid, labels):
             if not grid.inside(ni, nj) or labels[ni, nj] != FREE:
                 continue
             nd = grid.res * math.hypot(ni - si, nj - sj)
-            if nd < D[ni, nj]:
+            tie = abs(nd - D[ni, nj]) <= 1e-12 and label[si, sj] < label[ni, nj]
+            if nd < D[ni, nj] - 1e-12 or tie:
                 D[ni, nj] = nd
                 src[(ni, nj)] = (si, sj)
                 label[ni, nj] = label[si, sj]
