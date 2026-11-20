@@ -275,7 +275,24 @@ class PlanSession:
         summary = RunSummary(self.run_dir, plans, results, replans, self.clock() - t0,
                              dict(count.counts))
         self.print_summary(summary, est)
+        self.write_summary(summary, est)
         return summary
+
+    def write_summary(self, s, est):
+        """summary.yaml for report_run.py (the CSVs miss looks that saw no tag)."""
+        p = est.pose()
+        sx, sy, st = sigmas(est.pose_cov())
+        last = s.results[-1] if s.results else None
+        write_yaml(os.path.join(self.run_dir, 'summary.yaml'), {
+            'planner': self.kind, 'elapsed_s': round(s.elapsed_s, 2),
+            'counts': {k: int(s.counts.get(k, 0)) for k in ('drive', 'spin', 'look')},
+            'replans': s.replans, 'waypoints': len(s.results),
+            'goal_reached': bool(last and last.reached),
+            'final_estimate': {'x': round(p.x, 4), 'y': round(p.y, 4),
+                               'theta_deg': round(math.degrees(p.theta), 2),
+                               'sigma': [round(sx, 4), round(sy, 4),
+                                         round(math.degrees(st), 2)]},
+            'goal': list(self.world.goal)})
 
     def follow(self, goals, index, results):
         """Run goals in order; returns the last waypoint index (indices go on across replans)."""

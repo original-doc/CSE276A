@@ -144,7 +144,10 @@ def test_run_reaches_goal_and_logs(tmp_path, kind):
     assert s.run_dir.endswith(f'_{kind}')
     files = set(os.listdir(s.run_dir))
     assert {'config.yaml', 'console.txt', 'plan.yaml', 'plan.npz', 'trajectory.csv',
-            'steps.csv', 'observations.csv', 'waypoints.csv'} <= files
+            'steps.csv', 'observations.csv', 'waypoints.csv', 'summary.yaml'} <= files
+    summary = load(os.path.join(s.run_dir, 'summary.yaml'))
+    assert summary['counts'] == {k: s.counts.get(k, 0) for k in ('drive', 'spin', 'look')}
+    assert summary['goal_reached'] and summary['replans'] == 0
     assert s.replans == 0 and all(r.reached for r in s.results)
     assert math.dist((rig.rover.true.x, rig.rover.true.y), WORLD.goal) < 0.1
     rec = load(os.path.join(s.run_dir, 'plan.yaml'))
