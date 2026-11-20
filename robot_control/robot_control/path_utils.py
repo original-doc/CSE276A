@@ -6,6 +6,10 @@ from robot_control.se2 import Pose2
 from robot_control.world import clearance, point_segment_dist, segment_clearance
 
 
+class NoPath(Exception):
+    """Planner found no collision-free path (or its start / goal is not free)."""
+
+
 @dataclass
 class Plan:
     kind: str               # 'safe' | 'fast'
