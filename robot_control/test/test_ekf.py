@@ -1,3 +1,4 @@
+import dataclasses
 import math
 import os
 
@@ -9,7 +10,7 @@ from robot_control.ekf import (
     drive_jacobian, drive_model, expected_obs, initial_covariance, noise_from_config,
     obs_jacobian, pose_from_state, predict_drive, predict_spin, sigmas, state_from_pose, update,
 )
-from robot_control.landmark_map import load_map
+from robot_control.landmark_map import Landmark, load_map
 from robot_control.se2 import Pose2, to_child, wrap_angle
 from robot_control.tag_obs import make_obs
 
@@ -130,3 +131,42 @@ def test_far_tag_has_less_weight():
     assert near.accepted and far.accepted
     assert sigmas(near.P)[0] < sigmas(far.P)[0]
     assert abs(near.x[0] - 1.0) < abs(far.x[0] - 0.0)
+
+
+# ---------- iterated EKF (HW4, noise.relinearize) ----------
+
+with open(os.path.join(CONFIG, '..', 'hw4', 'nav.yaml')) as f:
+    HW4_NOISE = noise_from_config(yaml.safe_load(f)['ekf'])
+
+
+def big_turn_case(heading_err_deg, tag=(3.0, 1.0)):
+    """HW4 sim: robot at G after a turn, a tag 0.7 m away, heading sigma 19 deg."""
+    lm = Landmark(2, 3.0, 1.0, math.pi)
+    truth = Pose2(2.5, 0.5, math.radians(27.0))
+    seen = Landmark(2, tag[0], tag[1], math.pi)        # where the tag really is
+    x = state_from_pose(truth._replace(theta=truth.theta + math.radians(heading_err_deg)))
+    P = np.diag([0.02 ** 2, 0.02 ** 2, math.radians(19.0) ** 2])
+    return x, P, true_obs(truth, seen), lm, truth
+
+
+def test_iekf_keeps_position_after_large_heading_error():
+    x, P, obs, lm, truth = big_turn_case(24.0)
+    plain = update(x, P, obs, lm, dataclasses.replace(HW4_NOISE, relinearize=False))
+    iekf = update(x, P, obs, lm, HW4_NOISE)
+    assert HW4_NOISE.relinearize and plain.accepted and iekf.accepted
+    # first-order step puts the linearization error into the position
+    assert math.hypot(plain.x[0] - truth.x, plain.x[1] - truth.y) > 0.04
+    assert math.hypot(iekf.x[0] - truth.x, iekf.x[1] - truth.y) < 0.005
+    assert abs(math.degrees(wrap_angle(iekf.x[2] - truth.theta))) < 0.5
+    assert iekf.d2 < plain.d2 and is_spd(iekf.P)
+
+
+def test_iekf_still_rejects_wrong_map():
+    x, P, obs, lm, _ = big_turn_case(3.0, tag=(3.0, 1.4))     # tag 0.4 m from the map
+    r = update(x, P, obs, lm, HW4_NOISE)
+    assert not r.accepted and r.d2 > HW4_NOISE.gate
+    assert np.array_equal(r.x, x) and np.array_equal(r.P, P)
+
+
+def test_relinearize_off_by_default():
+    assert not NOISE.relinearize                                # HW2 nav.yaml has no key

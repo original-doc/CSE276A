@@ -10,7 +10,8 @@ from sim_rover import SimRover, make_calib
 from robot_control.ekf import noise_from_config
 from robot_control.estimator import LocalizationEstimator
 from robot_control.plan_run import (
-    drive_guard, ExecOptions, goal_params, plan_from, PlanSession, RunOptions)
+    drive_guard, ExecOptions, face_tag_heading, goal_params, plan_from, plan_goals,
+    PlanSession, RunOptions)
 from robot_control.se2 import Pose2
 from robot_control.stop_look import Move, NavigationHalt, Navigator, params_from_config, Replan
 from robot_control.world import parse_world
@@ -98,8 +99,28 @@ def test_goal_params():
     p = params_from_config(CFG)
     mid, last = goal_params(p, EX, False), goal_params(p, EX, True)
     assert (mid.pos_tol, mid.ang_tol) == pytest.approx((0.08, math.radians(15)))
-    assert last.pos_tol == pytest.approx(0.05) and last.ang_tol == pytest.approx(math.pi)
+    assert mid.near_dist == p.near_dist > 0              # pass a waypoint without turning back
+    assert last.pos_tol == pytest.approx(0.05) and last.ang_tol == pytest.approx(math.radians(15))
+    assert last.near_dist == 0.0                         # an overshot goal is driven back to
     assert mid.max_drive == p.max_drive                  # everything else unchanged
+    no_face = goal_params(p, ExecOptions.from_config({**CFG['exec'], 'goal_face_tag': False}),
+                          True)
+    assert no_face.ang_tol == pytest.approx(math.pi)
+
+
+def test_face_tag_heading():
+    # From G the nearest tags are 1 (2, 0) and 2 (3, 1), both 0.707 m away.
+    h = face_tag_heading(WORLD, WORLD.goal, math.radians(60), 0.25)
+    assert math.degrees(h) == pytest.approx(-135.0) or math.degrees(h) == pytest.approx(45.0)
+    # Left of the box the nearest tag is 11 (its face); tag 9 behind the box is hidden.
+    h = face_tag_heading(WORLD, (1.0, 1.5), math.radians(60), 0.25)
+    assert h == pytest.approx(0.0)
+    # Tag 11 (0.325 m) closer than min_dist: the wall tags 6 / 7 (1.118 m) instead.
+    h = face_tag_heading(WORLD, (1.0, 1.5), math.radians(60), 0.4)
+    assert abs(math.degrees(h)) == pytest.approx(153.43, abs=0.01)
+    plan, _ = plan_from(WORLD, 'fast', CFG['plan'], (0.5, 2.5))
+    goals = plan_goals(plan, EX, goal_heading=1.0)
+    assert goals[-1].theta == 1.0 and goals[-2].theta != 1.0
 
 
 @pytest.mark.parametrize('kind', ['safe', 'fast'])
@@ -141,7 +162,7 @@ def test_waypoint_tolerances(tmp_path):
     rig = Rig(tmp_path, 'fast')
     s = rig.session.run()
     mid = (pytest.approx(0.08), pytest.approx(math.radians(15)))
-    goal = (pytest.approx(0.05), pytest.approx(math.pi))
+    goal = (pytest.approx(0.05), pytest.approx(math.radians(15)))
     assert mid in rig.pos_tols and goal in rig.pos_tols
     assert rig.pos_tols[-1] == goal
     last = s.results[-1]

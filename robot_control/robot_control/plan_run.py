@@ -18,9 +18,12 @@ from robot_control.nav_log import (
 from robot_control.path_utils import densify, NoPath, to_goals
 from robot_control.plan_fast import plan_fast
 from robot_control.plan_safe import plan_safe
+from robot_control.se2 import Pose2
 from robot_control.stop_look import (
-    NavigationHalt, Navigator, NavLog, next_move, params_from_config, Replan, to_step)
-from robot_control.world import clearance, parse_world, segment_clearance
+    NavigationHalt, Navigator, NavLog, next_move, params_from_config, Replan,
+    tag_oblique_from, to_step)
+from robot_control.world import (
+    clearance, parse_world, segment_clearance, segment_enters_rect)
 
 PLANNERS = {'safe': plan_safe, 'fast': plan_fast}
 
@@ -33,12 +36,16 @@ class ExecOptions:
     goal_pos: float
     guard_overshoot: float
     max_replans: int
+    goal_face_tag: bool = True  # end at G facing the nearest tag (better last fix)
+    goal_ang: float = math.radians(15.0)
 
     @classmethod
     def from_config(cls, e):
         return cls(float(e['wp_spacing']), float(e['pass_pos']),
                    math.radians(float(e['pass_ang_deg'])), float(e['goal_pos']),
-                   float(e['guard_overshoot']), int(e['max_replans']))
+                   float(e['guard_overshoot']), int(e['max_replans']),
+                   bool(e.get('goal_face_tag', True)),
+                   math.radians(float(e.get('goal_ang_deg', 15.0))))
 
 
 @dataclass(frozen=True)
@@ -68,9 +75,12 @@ def drive_guard(world, r_guard, overshoot):
 
 
 def goal_params(params, ex, last):
-    """Intermediate waypoints: pass tolerances; the goal: tight position, any heading."""
+    """Intermediate waypoints: pass tolerances. The goal: tight position; its heading
+    (facing a tag, goal_face_tag) to goal_ang, else any heading."""
     if last:
-        return dataclasses.replace(params, pos_tol=ex.goal_pos, ang_tol=math.pi)
+        ang = ex.goal_ang if ex.goal_face_tag else math.pi
+        # near_dist 0: an overshot goal is behind the robot; drive back, do not skip it
+        return dataclasses.replace(params, pos_tol=ex.goal_pos, ang_tol=ang, near_dist=0.0)
     return dataclasses.replace(params, pos_tol=ex.pass_pos, ang_tol=ex.pass_ang)
 
 
@@ -94,8 +104,26 @@ def plan_from(world, kind, plan_cfg, start):
         raise NavigationHalt(f'no path from {start}: {e}')
 
 
-def plan_goals(plan, ex):
-    return to_goals(densify(plan.points, ex.wp_spacing))
+def face_tag_heading(world, p, max_oblique, min_dist):
+    """Heading from p to the nearest tag the camera can see from there (None if none)."""
+    best = None
+    for lm in world.landmarks.landmarks.values():
+        d = math.hypot(lm.x - p[0], lm.y - p[1])
+        if d < min_dist or tag_oblique_from(Pose2(p[0], p[1], 0.0), lm) > max_oblique:
+            continue
+        if any(segment_enters_rect(p, (lm.x, lm.y), o) for o in world.obstacles):
+            continue
+        if best is None or d < best[0]:
+            best = (d, math.atan2(lm.y - p[1], lm.x - p[0]))
+    return None if best is None else best[1]
+
+
+def plan_goals(plan, ex, goal_heading=None):
+    """Densified waypoints; the last one turned to goal_heading if given."""
+    goals = to_goals(densify(plan.points, ex.wp_spacing))
+    if goal_heading is not None:
+        goals[-1] = goals[-1]._replace(theta=goal_heading)
+    return goals
 
 
 class ActionCount(NavLog):
@@ -133,6 +161,10 @@ class PlanSession:
         self.noise = noise_from_config(cfg['ekf'])
         self.ex = ExecOptions.from_config(cfg['exec'])
         self.plan_cfg = cfg['plan']
+        self.goal_heading = None
+        if self.ex.goal_face_tag:
+            self.goal_heading = face_tag_heading(self.world, self.world.goal,
+                                                 self.params.max_oblique, cfg['look']['min_dist'])
         self.look = look
         self.execute = execute
         self.log_root = log_root
@@ -204,7 +236,7 @@ class PlanSession:
 
     def drive(self):
         plan, used_guard = self.plan(self.start_xy())
-        goals = plan_goals(plan, self.ex)
+        goals = plan_goals(plan, self.ex, self.goal_heading)
         self.print_plan(plan, goals, used_guard)
         record = {**plan_record(plan, goals), 'used_r_guard': used_guard, 'replans': []}
         write_yaml(os.path.join(self.run_dir, 'plan.yaml'), record)
@@ -229,7 +261,7 @@ class PlanSession:
                         raise NavigationHalt(f'more than {self.ex.max_replans} replans')
                     start = (e.pose.x, e.pose.y)
                     plan, used_guard = self.plan(start)
-                    goals = plan_goals(plan, self.ex)
+                    goals = plan_goals(plan, self.ex, self.goal_heading)
                     plans.append(plan)
                     self.print_plan(plan, goals, used_guard)
                     record['replans'].append({
@@ -274,7 +306,7 @@ class PlanSession:
     def dry_run(self):
         """Never moves: plan, look a few times, print the estimate and the first step."""
         plan, used_guard = self.plan(self.start_xy())
-        goals = plan_goals(plan, self.ex)
+        goals = plan_goals(plan, self.ex, self.goal_heading)
         self.print_plan(plan, goals, used_guard)
         est = self.new_estimator()
         nav = self.navigator(est, NavLog())
