@@ -6,7 +6,7 @@ Copies of `HW4/logs/<run>`; start pose in `config.yaml` is the default S (0.5, 2
 
 | run | planner | time | drives / spins / looks | replans | closest to box (centre) | final estimate vs G |
 |---|---|---|---|---|---|---|
-| `run_20261122_041857_fast` | fast | 31.7 s | 4 / 3 / 11 | 0 | 0.34 m | 7.5 cm |
-| `run_20261122_042134_safe` | safe | 106.8 s | 15 / 18 / 44 | 0 | 0.65 m | 5.2 cm |
+| `run_20261122_041141_safe` | safe | 106.1 s | 16 / 16 / 43 | 0 | 0.63 m | 2.1 cm |
+| `run_20261122_041959_fast` | fast | 31.4 s | 4 / 3 / 11 | 0 | 0.24 m | 5.3 cm |
 
 No `end.yaml` (measured end position) yet: add one per run for `HW4/report_run.py`.
