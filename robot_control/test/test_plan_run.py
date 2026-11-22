@@ -9,7 +9,8 @@ from sim_rover import SimRover, make_calib
 
 from robot_control.ekf import noise_from_config
 from robot_control.estimator import LocalizationEstimator
-from robot_control.plan_run import (
+from robot_control.plan_run import (  # noqa: I100
+    config_for,
     drive_guard, ExecOptions, face_tag_heading, goal_params, plan_from, plan_goals,
     PlanSession, RunOptions)
 from robot_control.se2 import Pose2
@@ -127,12 +128,12 @@ def test_face_tag_heading():
 def test_plan_from_falls_back_to_r_guard(kind):
     plan, used = plan_from(WORLD, kind, CFG['plan'], (0.5, 2.5))
     assert not used and plan.stats['r'] == pytest.approx(WORLD.r_inflate)
-    start = (1.5, 1.15)                                  # 0.175 m below the box
+    start = (1.5, 1.175)                                 # 0.173 m below the box
     plan, used = plan_from(WORLD, kind, CFG['plan'], start)
     assert used and plan.stats['r'] == pytest.approx(WORLD.r_guard)
     assert plan.points[0] == start
     with pytest.raises(NavigationHalt):
-        plan_from(WORLD, kind, CFG['plan'], (1.5, 1.2))  # 0.125 m < r_guard
+        plan_from(WORLD, kind, CFG['plan'], (1.5, 1.2))  # 0.148 m < r_guard
 
 
 # ---------- full session ----------
@@ -164,12 +165,13 @@ def test_run_reaches_goal_and_logs(tmp_path, kind):
 def test_waypoint_tolerances(tmp_path):
     rig = Rig(tmp_path, 'fast')
     s = rig.session.run()
-    mid = (pytest.approx(0.08), pytest.approx(math.radians(15)))
-    goal = (pytest.approx(0.05), pytest.approx(math.radians(15)))
+    ex = config_for(CFG, 'fast')['exec']                # fast: its own pass / goal tolerances
+    mid = (pytest.approx(ex['pass_pos']), pytest.approx(math.radians(ex['pass_ang_deg'])))
+    goal = (pytest.approx(ex['goal_pos']), pytest.approx(math.radians(ex['goal_ang_deg'])))
     assert mid in rig.pos_tols and goal in rig.pos_tols
     assert rig.pos_tols[-1] == goal
     last = s.results[-1]
-    assert math.dist((last.pose.x, last.pose.y), WORLD.goal) <= 0.05
+    assert math.dist((last.pose.x, last.pose.y), WORLD.goal) <= ex['goal_pos']
 
 
 class RefuseFirst:
@@ -222,3 +224,14 @@ def test_dry_run_never_moves(tmp_path):
 def test_unknown_planner(tmp_path):
     with pytest.raises(ValueError):
         PlanSession(CFG, WORLD_DATA, 'short', None, None, None, str(tmp_path))
+
+
+def test_config_for_merges_the_planner_section():
+    cfg = {'exec': {'wp_spacing': 0.5, 'pass_pos': 0.08}, 'control': {'max_drive': 0.75},
+           'fast': {'exec': {'wp_spacing': 0.8}}}
+    fast = config_for(cfg, 'fast')
+    assert fast['exec'] == {'wp_spacing': 0.8, 'pass_pos': 0.08}
+    assert fast['control'] == {'max_drive': 0.75} and 'fast' not in fast
+    safe = config_for(cfg, 'safe')
+    assert safe['exec'] == {'wp_spacing': 0.5, 'pass_pos': 0.08} and 'fast' not in safe
+    assert cfg['exec']['wp_spacing'] == 0.5                  # input untouched

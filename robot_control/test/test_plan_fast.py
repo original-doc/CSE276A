@@ -48,7 +48,7 @@ def test_default_layout_length():
     corner = (1.345 - r, 1.348 - r)                 # bottom-left inflated corner
     expected = math.dist(S, corner) + math.dist(corner, G)
     assert p.length == pytest.approx(expected)
-    assert p.length == pytest.approx(3.01, abs=0.01)
+    assert p.length == pytest.approx(2.99, abs=0.01)     # r_margin 0.06
     assert len(p.points) == 3
     assert p.points[1] == pytest.approx(corner)
     assert side_of(p.points[1], S, G) < 0           # right of S -> G (tie_side default)
@@ -139,7 +139,7 @@ def test_replan_from_other_start():
 
 
 def test_start_inside_inflated_box_fails_but_smaller_r_works():
-    start = (1.5, 1.15)                             # 0.175 m below the box
+    start = (1.5, 1.175)                            # 0.173 m below the box
     with pytest.raises(NoPath):
         plan_fast(WORLD, start=start)
     p = plan_fast(WORLD, start=start, r=WORLD.r_guard)

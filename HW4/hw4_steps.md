@@ -83,7 +83,8 @@ for p in (plan_safe(w), plan_fast(w)):
     print(p.kind, f'{p.length:.3f} m, min clearance {p.min_clearance:.3f} m,', p.points)"
 cd ..
 ```
-Expected with the defaults: safe ≈ 3.72 m, fast ≈ 3.03 m (one corner at (1.117, 1.117)).
+Expected with the defaults (box 0.31 × 0.304 m, `r_margin` 0.06): safe ≈ 3.70 m,
+fast ≈ 2.99 m (one corner at (1.157, 1.160)).
 
 ## 2. Planner figures (Mac, no robot)
 
@@ -173,7 +174,7 @@ What the output means:
 
 | line | meaning |
 |---|---|
-| `=== safe plan (r_inflate = 0.208 m): ...` | the plan; `r_guard` instead = start was too close for `r_inflate` |
+| `=== safe plan (r_inflate = 0.188 m): ...` | the plan; `r_guard` instead = start was too close for `r_inflate` |
 | `>>> wp k (...) reached: estimate ...` | one waypoint done (every 0.5 m along the path) |
 | `>>> REPLAN n: drive ... would pass too close` | a drive (counted 25 % long) would pass within `r_guard` of a wall / the box; new plan from the current estimate |
 | `HALT: more than 3 replans` / `... from an obstacle (< r_guard)` | stopped for safety |
@@ -193,7 +194,13 @@ Tunables in `nav.yaml`:
 | `exec: guard_overshoot` / `max_replans` | `0.25` / `3` | collision check margin, replan limit |
 | `ekf: relinearize` | `true` | iterated EKF update (large heading errors with close tags) |
 
-`r_margin` (0.08 m) and `guard_margin` (0.03 m) are in `world.yaml` (`margins:`).
+`r_margin` (0.06 m, was 0.08) and `guard_margin` (0.03 m) are in `world.yaml` (`margins:`):
+`r_inflate` = 0.188 m for planning, `r_guard` = 0.158 m for the drive guard. Keep `r_guard` below
+`r_inflate`, or a small deviation on the plan's edge triggers replans until the run halts.
+
+Per-planner overrides: a top-level `fast:` (or `safe:`) section in `nav.yaml` is merged over the
+shared sections for that planner only, e.g. `fast: {exec: {wp_spacing: 0.8}}`. The shipped `fast:`
+section uses 0.8 m waypoint spacing, `undershoot_c` 0.03, pass / goal tolerances 0.12 / 0.08 m.
 
 The terminal output of `hw4_nav` is also saved to `HW4/logs/run_<time>_<planner>/console.txt`.
 

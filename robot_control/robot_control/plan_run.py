@@ -65,6 +65,18 @@ class RunSummary:
     counts: dict = field(default_factory=dict)  # drive / spin / look
 
 
+def config_for(cfg, kind):
+    """nav.yaml with the planner's own section (e.g. `fast:`) merged over the shared one.
+
+    `fast: {exec: {wp_spacing: 0.8}}` changes only exec.wp_spacing, only for planner fast.
+    The planner sections themselves are dropped from the result.
+    """
+    out = {k: v for k, v in cfg.items() if k not in PLANNERS}
+    for section, values in (cfg.get(kind) or {}).items():
+        out[section] = {**(out.get(section) or {}), **values}
+    return out
+
+
 def drive_guard(world, r_guard, overshoot):
     """guard(pose, move): False if the drive, run `overshoot` long, passes within r_guard."""
     def guard(pose, move):
@@ -152,7 +164,8 @@ class PlanSession:
                  guard=None, sleep=time.sleep, out=print, clock=time.monotonic):
         if kind not in PLANNERS:
             raise ValueError(f'planner must be one of {sorted(PLANNERS)}, not {kind!r}')
-        self.cfg = cfg
+        self.cfg = config_for(cfg, kind)     # shared nav.yaml + the planner's own section
+        cfg = self.cfg
         self.world_data = world_data
         self.world = parse_world(world_data)
         self.kind = kind

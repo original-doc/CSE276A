@@ -76,7 +76,7 @@ def test_default_world():
     assert w.landmarks.ids() == list(range(12))
     assert len(w.obstacles) == 1 and w.obstacles[0] == Rect(1.5, 1.5, 0.31, 0.304)
     assert w.r_robot == pytest.approx(0.128, abs=1e-3)
-    assert w.r_inflate == pytest.approx(0.208, abs=1e-3)
+    assert w.r_inflate == pytest.approx(0.188, abs=1e-3)     # r_margin 0.06
     assert w.r_guard == pytest.approx(0.158, abs=1e-3)
     assert w.start.theta == pytest.approx(-math.pi / 4)
     assert w.goal == (2.5, 0.5)
