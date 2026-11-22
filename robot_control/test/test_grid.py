@@ -67,7 +67,7 @@ def test_obstacle_labels(field):
     grid, labels, *_ = field
     assert labels[5, 0] == 0 and labels[-1, 5] == 1 and labels[5, -1] == 2 and labels[0, 5] == 3
     assert labels[grid.cell_of(1.5, 1.5)] == 4
-    assert labels[grid.cell_of(1.33, 1.33)] == 4    # just inside the box corner
+    assert labels[grid.cell_of(1.36, 1.36)] == 4    # just inside the box corner
     assert labels[grid.cell_of(1.29, 1.5)] == FREE
     assert labels[grid.cell_of(0.5, 0.5)] == FREE
 

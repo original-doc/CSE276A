@@ -28,7 +28,7 @@ def test_length_and_clearance():
     pts = [(0.5, 0.5), (0.5, 2.5), (2.5, 2.5)]
     assert path_length(pts) == pytest.approx(4.0)
     assert path_min_clearance(pts, WORLD) == pytest.approx(0.5)
-    assert path_min_clearance([(1.5, 1.0)], WORLD) == pytest.approx(0.325)
+    assert path_min_clearance([(1.5, 1.0)], WORLD) == pytest.approx(0.348)
     assert path_min_clearance([(0.5, 1.5), (2.5, 1.5)], WORLD) == 0.0
 
 

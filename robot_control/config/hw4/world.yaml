@@ -1,7 +1,7 @@
 # HW4 world, frame = arena (bottom-left corner origin). All sizes in m, angles in deg.
 arena: {x0: 0.0, y0: 0.0, x1: 3.0, y1: 3.0}
 obstacles:
-  - {cx: 1.5, cy: 1.5, w: 0.35, h: 0.35}   # measure the real box and update
+  - {cx: 1.5, cy: 1.5, w: 0.31, h: 0.304}   # measured 2026-11-21: tag 9-11 = 31 cm, tag 8-10 = 30.4 cm
 robot: {length: 0.194, width: 0.168, extra: 0.0}   # extra: camera mount etc.
 margins: {r_margin: 0.08, guard_margin: 0.03}
 start: {x: 0.5, y: 2.5, theta_deg: -45.0}  # measured before each run
@@ -16,7 +16,7 @@ landmarks:        # yaw_deg = outward normal; walls as in HW3, obstacle faces 8-
   - {id: 5, x: 1.0, y: 3.0, yaw_deg: -90}
   - {id: 6, x: 0.0, y: 2.0, yaw_deg: 0}
   - {id: 7, x: 0.0, y: 1.0, yaw_deg: 0}
-  - {id: 8, x: 1.5, y: 1.325, yaw_deg: -90}
-  - {id: 9, x: 1.675, y: 1.5, yaw_deg: 0}
-  - {id: 10, x: 1.5, y: 1.675, yaw_deg: 90}
-  - {id: 11, x: 1.325, y: 1.5, yaw_deg: 180}
+  - {id: 8, x: 1.5, y: 1.652, yaw_deg: 90}      # top face, faces tags 4, 5
+  - {id: 9, x: 1.345, y: 1.5, yaw_deg: 180}     # left face, faces tags 6, 7
+  - {id: 10, x: 1.5, y: 1.348, yaw_deg: -90}    # bottom face, faces tags 0, 1
+  - {id: 11, x: 1.655, y: 1.5, yaw_deg: 0}      # right face, faces tags 2, 3

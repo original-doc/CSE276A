@@ -66,7 +66,7 @@ def test_wall_and_clearance():
     assert wall_dist((0.5, 2.5), w.arena) == pytest.approx(0.5)
     assert wall_dist((-0.1, 1.0), w.arena) == 0.0
     assert clearance((0.5, 2.5), w) == pytest.approx(0.5)
-    assert clearance((1.5, 1.0), w) == pytest.approx(0.325)            # box closer than wall
+    assert clearance((1.5, 1.0), w) == pytest.approx(0.348)            # box closer than wall
     assert segment_clearance((0.5, 0.5), (0.5, 2.5), w) == pytest.approx(0.5)
     assert segment_clearance((0.5, 1.5), (2.5, 1.5), w) == 0.0
 
@@ -74,7 +74,7 @@ def test_wall_and_clearance():
 def test_default_world():
     w = load_world(CONFIG)
     assert w.landmarks.ids() == list(range(12))
-    assert len(w.obstacles) == 1 and w.obstacles[0] == BOX
+    assert len(w.obstacles) == 1 and w.obstacles[0] == Rect(1.5, 1.5, 0.31, 0.304)
     assert w.r_robot == pytest.approx(0.128, abs=1e-3)
     assert w.r_inflate == pytest.approx(0.208, abs=1e-3)
     assert w.r_guard == pytest.approx(0.158, abs=1e-3)
@@ -96,11 +96,11 @@ def test_tags_must_match_box(change):
     if change == 'bigger_box':
         d['obstacles'][0].update(w=0.45, h=0.45)
     elif change == 'smaller_box':
-        d['obstacles'][0].update(w=0.30, h=0.30)
+        d['obstacles'][0].update(w=0.26, h=0.26)
     elif change == 'moved_tag':
         d['landmarks'][9]['x'] = 1.70
     else:
-        d['landmarks'][8]['yaw_deg'] = 90
+        d['landmarks'][8]['yaw_deg'] = -90
     with pytest.raises(ValueError):
         parse_world(d)
 

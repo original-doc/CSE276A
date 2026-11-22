@@ -51,14 +51,14 @@ Wall tags (same as HW3):
 | 6 | (0, 2) | +x |
 | 7 | (0, 1) | +x |
 
-Box: centre (1.5, 1.5), 0.35 m × 0.35 m, one tag in the middle of each face:
+Box: centre (1.5, 1.5), 0.31 m (x) × 0.304 m (y), one tag in the middle of each face:
 
 | tag | face | (x, y) m | faces |
 |---|---|---|---|
-| 8 | bottom | (1.5, 1.325) | −y |
-| 9 | right | (1.675, 1.5) | +x |
-| 10 | top | (1.5, 1.675) | +y |
-| 11 | left | (1.325, 1.5) | −x |
+| 8 | top | (1.5, 1.652) | +y (toward tags 4, 5) |
+| 9 | left | (1.345, 1.5) | −x (toward tags 6, 7) |
+| 10 | bottom | (1.5, 1.348) | −y (toward tags 0, 1) |
+| 11 | right | (1.655, 1.5) | +x (toward tags 2, 3) |
 
 Start S: robot centre (base_link) at (0.5, 2.5), facing −45° (towards G). Goal G: (2.5, 0.5).
 Mark S with tape (centre + heading line).

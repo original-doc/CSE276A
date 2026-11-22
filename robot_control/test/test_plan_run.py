@@ -112,10 +112,10 @@ def test_face_tag_heading():
     # From G the nearest tags are 1 (2, 0) and 2 (3, 1), both 0.707 m away.
     h = face_tag_heading(WORLD, WORLD.goal, math.radians(60), 0.25)
     assert math.degrees(h) == pytest.approx(-135.0) or math.degrees(h) == pytest.approx(45.0)
-    # Left of the box the nearest tag is 11 (its face); tag 9 behind the box is hidden.
+    # Left of the box the nearest tag is 9 (its face); tag 11 behind the box is hidden.
     h = face_tag_heading(WORLD, (1.0, 1.5), math.radians(60), 0.25)
     assert h == pytest.approx(0.0)
-    # Tag 11 (0.325 m) closer than min_dist: the wall tags 6 / 7 (1.118 m) instead.
+    # Tag 9 (0.345 m) closer than min_dist: the wall tags 6 / 7 (1.118 m) instead.
     h = face_tag_heading(WORLD, (1.0, 1.5), math.radians(60), 0.4)
     assert abs(math.degrees(h)) == pytest.approx(153.43, abs=0.01)
     plan, _ = plan_from(WORLD, 'fast', CFG['plan'], (0.5, 2.5))

@@ -45,10 +45,10 @@ def check_valid(plan, world, r):
 def test_default_layout_length():
     r = WORLD.r_inflate
     p = plan_fast(WORLD)
-    corner = (1.325 - r, 1.325 - r)                 # bottom-left inflated corner
+    corner = (1.345 - r, 1.348 - r)                 # bottom-left inflated corner
     expected = math.dist(S, corner) + math.dist(corner, G)
     assert p.length == pytest.approx(expected)
-    assert p.length == pytest.approx(3.03, abs=0.01)
+    assert p.length == pytest.approx(3.01, abs=0.01)
     assert len(p.points) == 3
     assert p.points[1] == pytest.approx(corner)
     assert side_of(p.points[1], S, G) < 0           # right of S -> G (tie_side default)
@@ -59,7 +59,7 @@ def test_default_layout_length():
 def test_tie_side_left():
     r = WORLD.r_inflate
     p = plan_fast(WORLD, {'tie_side': 'left'})
-    assert p.points[1] == pytest.approx((1.675 + r, 1.675 + r))
+    assert p.points[1] == pytest.approx((1.655 + r, 1.652 + r))
     assert p.length == pytest.approx(plan_fast(WORLD).length)
 
 

@@ -16,7 +16,7 @@ def test_box_hides_tags_behind_it():
     rover = SimRover(WORLD.landmarks, Pose2(1.0, 1.5, 0.0), np.random.default_rng(0),
                      measured_noise(), occluders=WORLD.obstacles)
     seen, _ = rover.look()
-    assert 11 in seen                       # the face towards the robot
+    assert 9 in seen                        # the face towards the robot
     assert 2 not in seen and 3 not in seen  # wall tags behind the box (x = 3)
     open_view = SimRover(WORLD.landmarks, Pose2(1.0, 1.5, 0.0), np.random.default_rng(0),
                          measured_noise())
