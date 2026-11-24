@@ -59,3 +59,11 @@ exec:
   goal_ang_deg: 15.0
   guard_overshoot: 0.25  # drives run up to 25 % long (HW3)
   max_replans: 3
+
+# Per-planner overrides, merged over the sections above (plan_run.config_for).
+fast:
+  # Run 032157_fast: 27 stops in 87 s, 85 % standing still; drives averaged 0.23 m (0.5 m
+  # spacing minus the undershoot) and still ran 15-20 % long; the 8 cm pass tolerance caused
+  # side-step turns; a 10 cm last fix at G caused a turn-around. Sim: 81 s -> 45 s.
+  control: {undershoot_c: 0.03}                               # was 0.08
+  exec: {wp_spacing: 0.8, pass_pos: 0.12, goal_pos: 0.08}     # were 0.5, 0.08, 0.05

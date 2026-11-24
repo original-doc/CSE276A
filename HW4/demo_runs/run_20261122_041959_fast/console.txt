@@ -1,0 +1,32 @@
+log: /home/ubuntu/ros2_ws/src/CSE276A/HW4/logs/run_20261122_041959_fast
+=== fast plan (r_inflate = 0.188 m): length 2.989 m, min clearance 0.252 m, 6 nodes, 6 expanded, 0 ms
+  wp  1: (0.828, 1.830) heading -63.9
+  wp  2: (1.157, 1.160) heading -26.2
+  wp  3: (1.828, 0.830) heading -26.2
+  wp  4: (2.500, 0.500) heading -135.0
+starting in 3...
+starting in 2...
+starting in 1...
+  look: 60 frames, tags [0@2.62m, 2@3.00m, 3@2.61m, 8@1.29m, 9@1.32m], rejected {1: 'out of range (d 3.01 m, oblique 30 deg)'}
+  spin  cw   21.198 deg cmd 0.35  T 0.22 s
+  look: 45 frames, tags [0@2.62m, 2@2.95m, 8@1.29m, 9@1.31m], rejected {1: 'out of range (d 3.02 m, oblique 31 deg)'}
+  drive fwd   0.696 m   cmd 0.30  T 1.82 s
+  look: 30 frames, tags [0@1.87m, 1@2.23m, 9@0.58m]
+>>> wp 1 (0.828, 1.830) reached: estimate (+0.858, +1.824, -65.1 deg), 3 looks, tags [0, 1, 2, 8, 9] 
+  look: 30 frames, tags [0@1.87m, 1@2.23m, 9@0.58m]
+  drive fwd   0.678 m   cmd 0.30  T 1.77 s
+  look: 18 frames, tags [0@1.17m, 1@1.43m]
+  spin  ccw  34.613 deg cmd 0.35  T 0.28 s
+  look: 18 frames, tags [1@1.44m, 2@1.86m]
+>>> wp 2 (1.157, 1.160) reached: estimate (+1.162, +1.166, -28.2 deg), 3 looks, tags [0, 1, 2, 9] 
+  look: 20 frames, tags [1@1.44m, 2@1.86m]
+  drive fwd   0.698 m   cmd 0.30  T 1.82 s
+  look: 10 frames, tags [2@1.15m]
+>>> wp 3 (1.828, 0.830) reached: estimate (+1.861, +0.799, -26.6 deg), 2 looks, tags [1, 2] 
+  look: 10 frames, tags [2@1.15m]
+  drive fwd   0.655 m   cmd 0.30  T 1.71 s
+  look: 0 frames, tags []
+  spin  cw  108.362 deg cmd 0.35  T 0.71 s  !! pulse T = 0.71 s outside fitted 0.222-0.579 s
+  look: 9 frames, tags [1@0.72m]
+>>> wp 4 (2.500, 0.500) reached: estimate (+2.542, +0.468, -123.6 deg), 3 looks, tags [1, 2] 
+=== done in 31.4 s: 4 drives, 3 spins, 11 looks, 0 replans; final estimate (+2.542, +0.468, -123.6 deg); log /home/ubuntu/ros2_ws/src/CSE276A/HW4/logs/run_20261122_041959_fast

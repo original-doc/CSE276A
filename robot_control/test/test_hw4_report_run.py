@@ -36,7 +36,7 @@ def test_metrics(logs):
     assert m['time (s)'] == pytest.approx(fast.elapsed_s, abs=0.01)
     assert m['end error, measured (cm)'] == pytest.approx(100 * math.dist((2.53, 0.46),
                                                                           (2.5, 0.5)))
-    assert m['end error, estimate (cm)'] <= 5.0 + 1e-6
+    assert m['end error, estimate (cm)'] <= 8.0 + 1e-6      # fast goal_pos 0.08 (nav.yaml fast:)
     assert m['actual min clearance, est. (m)'] > 0.128
     m = report_run.metrics(report_run.load_run(safe.run_dir))
     assert 'end error, measured (cm)' not in m and m['replans'] == 0

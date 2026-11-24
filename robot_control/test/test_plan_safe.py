@@ -81,7 +81,7 @@ def test_start_off_gvd():
 
 
 def test_start_too_close():
-    start = (1.5, 1.15)                                         # 0.175 m below the box
+    start = (1.5, 1.175)                                        # 0.173 m below the box
     assert WORLD.r_guard < clearance(start, WORLD) < WORLD.r_inflate
     with pytest.raises(NoPath):
         plan_safe(WORLD, start=start)
