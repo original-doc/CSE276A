@@ -1,0 +1,105 @@
+log: /home/ubuntu/ros2_ws/src/CSE276A/HW4/logs/run_20261122_042134_safe
+=== safe plan (r_inflate = 0.188 m): length 3.698 m, min clearance 0.500 m, 808 nodes, 439 expanded, 502 ms
+  wp  1: (0.770, 2.210) heading -103.2
+  wp  2: (0.690, 1.870) heading -90.0
+  wp  3: (0.690, 1.450) heading -90.0
+  wp  4: (0.690, 1.030) heading -71.6
+  wp  5: (0.750, 0.850) heading -45.0
+  wp  6: (0.830, 0.770) heading -14.9
+  wp  7: (1.130, 0.690) heading +0.0
+  wp  8: (1.550, 0.690) heading +0.0
+  wp  9: (1.970, 0.690) heading +15.9
+  wp 10: (2.250, 0.770) heading -47.2
+  wp 11: (2.500, 0.500) heading -135.0
+starting in 3...
+starting in 2...
+starting in 1...
+  look: 54 frames, tags [0@2.62m, 3@2.62m, 8@1.30m, 9@1.32m], rejected {1: 'out of range (d 3.01 m, oblique 31 deg)', 2: 'out of range (d 3.01 m, oblique 31 deg)'}
+  drive fwd   0.304 m   cmd 0.30  T 0.83 s  !! T = 0.83 s outside calibrated 2-4 s
+  look: 32 frames, tags [2@2.64m, 3@2.30m, 8@0.94m, 9@0.97m]
+  spin  cw   18.237 deg cmd 0.35  T 0.20 s
+  look: 45 frames, tags [0@2.36m, 1@2.68m, 2@2.60m, 8@0.94m, 9@0.97m]
+  spin  cw   35.478 deg cmd 0.35  T 0.30 s
+  look: 9 frames, tags [0@2.35m]
+>>> wp 1 (0.770, 2.210) reached: estimate (+0.770, +2.280, -112.5 deg), 4 looks, tags [0, 1, 2, 3, 8, 9] 
+  look: 9 frames, tags [0@2.35m]
+  spin  ccw  11.427 deg cmd 0.35  T 0.13 s  !! pulse T = 0.13 s outside fitted 0.241-0.74 s
+  look: 19 frames, tags [0@2.35m, 1@2.62m], rejected {7: 'only 1 frames'}
+  drive fwd   0.328 m   cmd 0.30  T 0.89 s  !! T = 0.89 s outside calibrated 2-4 s
+  look: 20 frames, tags [0@2.00m, 7@1.16m]
+>>> wp 2 (0.690, 1.870) reached: estimate (+0.690, +1.945, -102.5 deg), 3 looks, tags [0, 1, 7] 
+  look: 18 frames, tags [0@2.00m, 7@1.16m]
+  spin  ccw  12.649 deg cmd 0.35  T 0.14 s  !! pulse T = 0.14 s outside fitted 0.241-0.74 s
+  look: 24 frames, tags [0@2.01m, 1@2.37m, 7@1.16m]
+  drive fwd   0.403 m   cmd 0.30  T 1.08 s  !! T = 1.08 s outside calibrated 2-4 s
+  look: 9 frames, tags [0@1.56m]
+  spin  ccw  17.100 deg cmd 0.35  T 0.16 s  !! pulse T = 0.16 s outside fitted 0.241-0.74 s
+  look: 20 frames, tags [0@1.56m, 1@2.04m]
+  drive fwd   0.084 m   cmd 0.30  T 0.27 s  !! T = 0.27 s outside calibrated 2-4 s
+  look: 20 frames, tags [0@1.46m, 1@1.96m]
+>>> wp 3 (0.690, 1.450) reached: estimate (+0.690, +1.442, -75.7 deg), 5 looks, tags [0, 1, 7] 
+  look: 20 frames, tags [0@1.46m, 1@1.96m]
+  spin  cw   14.415 deg cmd 0.35  T 0.18 s
+  look: 10 frames, tags [0@1.46m]
+  drive fwd   0.310 m   cmd 0.30  T 0.84 s  !! T = 0.84 s outside calibrated 2-4 s
+  look: 10 frames, tags [0@1.14m]
+  spin  ccw  27.462 deg cmd 0.35  T 0.23 s
+  look: 18 frames, tags [0@1.15m, 1@1.77m]
+  spin  ccw  26.401 deg cmd 0.35  T 0.22 s
+  look: 20 frames, tags [0@1.16m, 1@1.78m]
+  drive fwd   0.087 m   cmd 0.30  T 0.28 s  !! T = 0.28 s outside calibrated 2-4 s
+  look: 20 frames, tags [0@1.05m, 1@1.67m]
+  spin  cw   18.127 deg cmd 0.35  T 0.20 s
+  look: 10 frames, tags [0@1.04m]
+>>> wp 4 (0.690, 1.030) reached: estimate (+0.692, +1.004, -80.0 deg), 7 looks, tags [0, 1] 
+  look: 9 frames, tags [0@1.04m]
+  drive fwd   0.159 m   cmd 0.30  T 0.46 s  !! T = 0.46 s outside calibrated 2-4 s
+  look: 10 frames, tags [0@0.86m]
+  spin  ccw  34.425 deg cmd 0.35  T 0.28 s
+  look: 20 frames, tags [0@0.87m, 1@1.55m]
+>>> wp 5 (0.750, 0.850) reached: estimate (+0.725, +0.827, -49.8 deg), 3 looks, tags [0, 1] 
+  look: 20 frames, tags [0@0.87m, 1@1.55m]
+  spin  ccw  21.776 deg cmd 0.35  T 0.19 s
+  look: 20 frames, tags [1@1.55m, 2@2.33m]
+  drive fwd   0.125 m   cmd 0.30  T 0.38 s  !! T = 0.38 s outside calibrated 2-4 s
+  look: 10 frames, tags [1@1.39m]
+>>> wp 6 (0.830, 0.770) reached: estimate (+0.836, +0.768, -26.5 deg), 3 looks, tags [0, 1, 2] 
+  look: 8 frames, tags [1@1.39m]
+  drive fwd   0.296 m   cmd 0.30  T 0.81 s  !! T = 0.81 s outside calibrated 2-4 s
+  look: 18 frames, tags [1@1.07m, 2@1.92m]
+  spin  ccw  24.794 deg cmd 0.35  T 0.21 s
+  look: 25 frames, tags [1@1.07m, 2@1.94m, 3@2.35m]
+>>> wp 7 (1.130, 0.690) reached: estimate (+1.121, +0.618, +3.3 deg), 3 looks, tags [1, 2, 3] 
+  look: 26 frames, tags [1@1.07m, 2@1.94m, 3@2.36m]
+  drive fwd   0.343 m   cmd 0.30  T 0.93 s  !! T = 0.93 s outside calibrated 2-4 s
+  look: 20 frames, tags [2@1.57m, 3@2.05m]
+  spin  ccw  25.985 deg cmd 0.35  T 0.22 s
+  look: 10 frames, tags [3@2.07m], rejected {2: 'only 1 frames'}
+  drive fwd   0.106 m   cmd 0.30  T 0.33 s  !! T = 0.33 s outside calibrated 2-4 s
+  look: 15 frames, tags [2@1.48m, 3@1.98m]
+  spin  cw   30.782 deg cmd 0.35  T 0.27 s
+  look: 0 frames, tags []
+>>> wp 8 (1.550, 0.690) reached: estimate (+1.546, +0.684, +0.0 deg), 5 looks, tags [1, 2, 3] 
+  look: 1 frames, tags [], rejected {2: 'only 1 frames'}
+  drive fwd   0.331 m   cmd 0.30  T 0.90 s  !! T = 0.90 s outside calibrated 2-4 s
+  look: 10 frames, tags [2@1.14m]
+  spin  ccw  16.765 deg cmd 0.35  T 0.16 s  !! pulse T = 0.16 s outside fitted 0.241-0.74 s
+  look: 18 frames, tags [2@1.14m, 3@1.73m]
+>>> wp 9 (1.970, 0.690) reached: estimate (+1.909, +0.670, +16.7 deg), 3 looks, tags [2, 3] 
+  look: 18 frames, tags [2@1.14m, 3@1.73m]
+  drive fwd   0.265 m   cmd 0.30  T 0.73 s  !! T = 0.73 s outside calibrated 2-4 s
+  look: 9 frames, tags [2@0.85m]
+  spin  cw   64.616 deg cmd 0.35  T 0.46 s
+  look: 0 frames, tags []
+>>> wp 10 (2.250, 0.770) reached: estimate (+2.191, +0.751, -47.2 deg), 3 looks, tags [2, 3] 
+  look: 0 frames, tags []
+  spin  ccw   8.149 deg cmd 0.35  T 0.11 s  !! pulse T = 0.11 s outside fitted 0.241-0.74 s
+  look: 0 frames, tags []
+  drive fwd   0.306 m   cmd 0.30  T 0.83 s  !! T = 0.83 s outside calibrated 2-4 s
+  look: 0 frames, tags []
+  drive fwd   0.092 m   cmd 0.30  T 0.29 s  !! T = 0.29 s outside calibrated 2-4 s
+  look: 0 frames, tags []
+  spin  cw   95.946 deg cmd 0.35  T 0.64 s
+  look: 8 frames, tags [1@0.70m]
+>>> wp 11 (2.500, 0.500) reached: estimate (+2.529, +0.456, -131.2 deg), 5 looks, tags [1] 
+=== done in 106.8 s: 15 drives, 18 spins, 44 looks, 0 replans; final estimate (+2.529, +0.456, -131.2 deg); log /home/ubuntu/ros2_ws/src/CSE276A/HW4/logs/run_20261122_042134_safe

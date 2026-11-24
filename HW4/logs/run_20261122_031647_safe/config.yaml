@@ -1,0 +1,48 @@
+floor: study_wood2_hw2_ext
+tag_z_sign: 1
+calib_dir: /home/ubuntu/ros2_ws/src/CSE276A/robot_control/config/open_loop
+world:
+  arena: {x0: 0.0, y0: 0.0, x1: 3.0, y1: 3.0}
+  obstacles:
+  - {cx: 1.5, cy: 1.5, w: 0.31, h: 0.304}
+  robot: {length: 0.194, width: 0.168, extra: 0.0}
+  margins: {r_margin: 0.08, guard_margin: 0.03}
+  start: {x: 0.5, y: 2.5, theta_deg: -45.0}
+  goal: {x: 2.5, y: 0.5}
+  tag_size: 0.156
+  landmarks:
+  - {id: 0, x: 1.0, y: 0.0, yaw_deg: 90}
+  - {id: 1, x: 2.0, y: 0.0, yaw_deg: 90}
+  - {id: 2, x: 3.0, y: 1.0, yaw_deg: 180}
+  - {id: 3, x: 3.0, y: 2.0, yaw_deg: 180}
+  - {id: 4, x: 2.0, y: 3.0, yaw_deg: -90}
+  - {id: 5, x: 1.0, y: 3.0, yaw_deg: -90}
+  - {id: 6, x: 0.0, y: 2.0, yaw_deg: 0}
+  - {id: 7, x: 0.0, y: 1.0, yaw_deg: 0}
+  - {id: 8, x: 1.5, y: 1.652, yaw_deg: 90}
+  - {id: 9, x: 1.345, y: 1.5, yaw_deg: 180}
+  - {id: 10, x: 1.5, y: 1.348, yaw_deg: -90}
+  - {id: 11, x: 1.655, y: 1.5, yaw_deg: 0}
+nav_config: /home/ubuntu/ros2_ws/src/CSE276A/robot_control/config/hw4/nav.yaml
+planner: safe
+nav:
+  detector_ids: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+  tolerance: {pos: 0.05, ang_deg: 8.0}
+  levels:
+    drive: [0.3, 0.2]
+    spin: [0.35]
+  look: {window_s: 1.0, min_count: 3, max_spread: 0.02, min_dist: 0.25, max_dist: 3.0,
+    max_oblique_deg: 60.0}
+  control: {max_iters: 15, max_searches: 2, search_max_dist: 2.5, align_min_deg: 8.0,
+    align_max_deg: 15.0, view_half_deg: 35.0, max_drive: 0.75, undershoot_k: 0.03,
+    undershoot_c: 0.08, undershoot_min: 0.3, min_split_deg: 45.0, fine_max_deg: 0.0,
+    coarse_min_deg: 0.0, near_dist: 0.3, near_turn_deg: 45.0}
+  ekf:
+    init_sigma: {xy: 0.01, theta_deg: 1.0}
+    motion: {k_d: 0.2, c_d: 0.01, k_lat: 0.03, k_hd_deg: 6.0, k_s: 0.15, c_s_deg: 6.0}
+    obs: {a: 0.005, b: 0.01, c_deg: 1.5, e_deg: 1.5, oblique_deg: 30.0, oblique_factor: 2.0}
+    gate: 11.34
+    relinearize: true
+  plan: {grid_res: 0.02, simplify_tol: 0.03, tie_side: right, tie_tol: 0.02, turn_cost_s: 0.0}
+  exec: {wp_spacing: 0.5, pass_pos: 0.08, pass_ang_deg: 15.0, goal_pos: 0.05, goal_face_tag: true,
+    goal_ang_deg: 15.0, guard_overshoot: 0.25, max_replans: 3}

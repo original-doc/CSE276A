@@ -1,0 +1,12 @@
+planner: safe
+elapsed_s: 94.14
+counts: {drive: 14, spin: 13, look: 38}
+replans: 0
+waypoints: 11
+goal_reached: true
+final_estimate:
+  x: 2.5215
+  y: 0.5019
+  theta_deg: -130.17
+  sigma: [0.0214, 0.0235, 2.47]
+goal: [2.5, 0.5]
