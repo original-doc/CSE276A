@@ -1,0 +1,64 @@
+planner: fast
+length: 2.9891
+min_clearance: 0.252
+points:
+- [0.5, 2.5]
+- [1.1567, 1.1597]
+- [2.5, 0.5]
+stats: {nodes: 6, edges: 10, candidate_pairs: 15, expanded: 6, cost: 2.989098, time_s: 0.000253,
+  r: 0.188316}
+waypoints:
+- [0.8283, 1.8298, -63.9]
+- [1.1567, 1.1597, -26.16]
+- [1.8283, 0.8298, -26.16]
+- [2.5, 0.5, -135.0]
+used_r_guard: false
+replans:
+- t: 11.65
+  pose: [0.7911, 1.8202, -52.31]
+  used_r_guard: false
+  planner: fast
+  length: 2.2515
+  min_clearance: 0.252
+  points:
+  - [0.7911, 1.8202]
+  - [1.1567, 1.1597]
+  - [2.5, 0.5]
+  stats: {nodes: 6, edges: 9, candidate_pairs: 15, expanded: 6, cost: 2.251471, time_s: 0.001149,
+    r: 0.188316}
+  waypoints:
+  - [1.1567, 1.1597, -26.16]
+  - [1.8283, 0.8298, -26.16]
+  - [2.5, 0.5, -135.0]
+- t: 12.7
+  pose: [0.7958, 1.8197, -52.43]
+  used_r_guard: false
+  planner: fast
+  length: 2.2488
+  min_clearance: 0.252
+  points:
+  - [0.7958, 1.8197]
+  - [1.1567, 1.1597]
+  - [2.5, 0.5]
+  stats: {nodes: 6, edges: 9, candidate_pairs: 15, expanded: 6, cost: 2.248769, time_s: 0.001114,
+    r: 0.188316}
+  waypoints:
+  - [1.1567, 1.1597, -26.16]
+  - [1.8283, 0.8298, -26.16]
+  - [2.5, 0.5, -135.0]
+- t: 13.76
+  pose: [0.7976, 1.8196, -52.48]
+  used_r_guard: false
+  planner: fast
+  length: 2.2479
+  min_clearance: 0.252
+  points:
+  - [0.7976, 1.8196]
+  - [1.1567, 1.1597]
+  - [2.5, 0.5]
+  stats: {nodes: 6, edges: 9, candidate_pairs: 15, expanded: 6, cost: 2.247854, time_s: 0.001038,
+    r: 0.188316}
+  waypoints:
+  - [1.1567, 1.1597, -26.16]
+  - [1.8283, 0.8298, -26.16]
+  - [2.5, 0.5, -135.0]
