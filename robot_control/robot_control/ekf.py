@@ -28,6 +28,7 @@ class EkfNoise:
     oblique: float      # rad
     oblique_factor: float
     gate: float
+    relinearize: bool = False   # HW4: retry a gated tag at the heading it implies
 
 
 def noise_from_config(ekf):
@@ -40,7 +41,7 @@ def noise_from_config(ekf):
         k_s=m['k_s'], c_s=r(m['c_s_deg']),
         obs_a=o['a'], obs_b=o['b'], obs_c=r(o['c_deg']), obs_e=r(o['e_deg']),
         oblique=r(o['oblique_deg']), oblique_factor=o['oblique_factor'],
-        gate=ekf['gate'])
+        gate=ekf['gate'], relinearize=bool(ekf.get('relinearize', False)))
 
 
 def state_from_pose(pose):
@@ -132,6 +133,9 @@ def innovation(z, h):
     return nu
 
 
+IEKF_ITERS = 3
+
+
 @dataclass
 class UpdateResult:
     x: np.ndarray
@@ -141,14 +145,38 @@ class UpdateResult:
 
 
 def update(x, P, obs, lm, noise):
-    """One tag observation. Rejected (state unchanged) when d2 > noise.gate."""
+    """One tag observation. Rejected (state unchanged) when d2 > noise.gate.
+
+    noise.relinearize (HW4): iterated EKF. Linearize first at the heading the tag
+    itself gives (lm.yaw - psi), then at each new estimate (IEKF_ITERS times). With a
+    20 deg heading error and a tag 0.7 m away the single first-order step either fails
+    the gate or puts the linearization error into the position (HW4 sim). A tag that
+    disagrees with the map still fails the gate after the iterations.
+    """
     z = np.array([obs.x, obs.y, obs.psi])
-    H = obs_jacobian(x, lm)
     R = obs_noise(obs, noise)
-    nu = innovation(z, expected_obs(x, lm))
+    if not noise.relinearize:
+        return update_at(x, P, z, R, lm, noise.gate, x)
+    x_lin = x.copy()
+    x_lin[2] = wrap_angle(lm.yaw - obs.psi)
+    for _ in range(IEKF_ITERS):
+        r = update_at(x, P, z, R, lm, math.inf, x_lin)
+        x_lin = r.x
+    if r.d2 > noise.gate:
+        return UpdateResult(x, P, False, r.d2)
+    return r
+
+
+def update_at(x, P, z, R, lm, gate, x_lin):
+    """EKF update of (x, P) with the measurement model linearized at x_lin."""
+    H = obs_jacobian(x_lin, lm)
+    dx = x - x_lin
+    dx[2] = wrap_angle(dx[2])
+    nu = innovation(z, expected_obs(x_lin, lm)) - H @ dx
+    nu[2] = wrap_angle(nu[2])
     S = H @ P @ H.T + R
     d2 = float(nu @ np.linalg.solve(S, nu))
-    if d2 > noise.gate:
+    if d2 > gate:
         return UpdateResult(x, P, False, d2)
     K = P @ H.T @ np.linalg.inv(S)
     x_new = x + K @ nu

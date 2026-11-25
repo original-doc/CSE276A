@@ -1,0 +1,38 @@
+log: /home/ubuntu/ros2_ws/src/CSE276A/HW4/logs/run_20261122_041440_fast
+=== fast plan (r_inflate = 0.188 m): length 2.989 m, min clearance 0.252 m, 6 nodes, 6 expanded, 0 ms
+  wp  1: (0.828, 1.830) heading -63.9
+  wp  2: (1.157, 1.160) heading -26.2
+  wp  3: (1.828, 0.830) heading -26.2
+  wp  4: (2.500, 0.500) heading -135.0
+starting in 3...
+starting in 2...
+starting in 1...
+  look: 60 frames, tags [0@2.64m, 3@2.61m, 8@1.30m, 9@1.32m], rejected {1: 'out of range (d 3.03 m, oblique 30 deg)', 2: 'out of range (d 3.01 m, oblique 31 deg)'}
+  spin  cw   21.083 deg cmd 0.35  T 0.22 s
+  look: 45 frames, tags [0@2.62m, 2@2.94m, 8@1.30m, 9@1.32m], rejected {1: 'out of range (d 3.03 m, oblique 30 deg)'}
+  drive fwd   0.696 m   cmd 0.30  T 1.82 s
+  look: 20 frames, tags [0@1.85m, 1@2.25m]
+>>> wp 1 (0.828, 1.830) reached: estimate (+0.739, +1.844, -69.9 deg), 3 looks, tags [0, 1, 2, 3, 8, 9] 
+  look: 20 frames, tags [0@1.85m, 1@2.25m]
+  spin  ccw  11.238 deg cmd 0.35  T 0.13 s  !! pulse T = 0.13 s outside fitted 0.241-0.74 s
+  look: 30 frames, tags [0@1.86m, 1@2.24m, 9@0.63m]
+>>> REPLAN 1: drive 0.694 m from Pose2(x=0.7911223472077906, y=1.8201839107275375, theta=-0.9130078565396711) would pass too close
+=== fast plan (r_inflate = 0.188 m): length 2.251 m, min clearance 0.252 m, 6 nodes, 6 expanded, 1 ms
+  wp  1: (1.157, 1.160) heading -26.2
+  wp  2: (1.828, 0.830) heading -26.2
+  wp  3: (2.500, 0.500) heading -135.0
+  look: 30 frames, tags [0@1.86m, 1@2.24m, 9@0.63m]
+>>> REPLAN 2: drive 0.691 m from Pose2(x=0.7957623139262858, y=1.8196527854314328, theta=-0.9149895006238726) would pass too close
+=== fast plan (r_inflate = 0.188 m): length 2.249 m, min clearance 0.252 m, 6 nodes, 6 expanded, 1 ms
+  wp  1: (1.157, 1.160) heading -26.2
+  wp  2: (1.828, 0.830) heading -26.2
+  wp  3: (2.500, 0.500) heading -135.0
+  look: 24 frames, tags [0@1.86m, 1@2.24m, 9@0.63m]
+>>> REPLAN 3: drive 0.690 m from Pose2(x=0.7975569155427658, y=1.819589971603847, theta=-0.91589471570205) would pass too close
+=== fast plan (r_inflate = 0.188 m): length 2.248 m, min clearance 0.252 m, 6 nodes, 6 expanded, 1 ms
+  wp  1: (1.157, 1.160) heading -26.2
+  wp  2: (1.828, 0.830) heading -26.2
+  wp  3: (2.500, 0.500) heading -135.0
+  look: 30 frames, tags [0@1.86m, 1@2.24m, 9@0.63m]
+>>> REPLAN 4: drive 0.689 m from Pose2(x=0.7985337464457011, y=1.8195990315659831, theta=-0.9164334949129942) would pass too close
+HALT: more than 3 replans

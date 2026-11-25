@@ -68,6 +68,15 @@ class NavigationHalt(RuntimeError):
     """Tags keep disagreeing with the estimate: map, extrinsic or tag frame is wrong."""
 
 
+class Replan(Exception):
+    """guard() refused a drive (HW4): plan again from `pose`."""
+
+    def __init__(self, pose, move):
+        super().__init__(f'drive {move.value:.3f} m from {pose} would pass too close')
+        self.pose = pose
+        self.move = move
+
+
 # ---------- planning ----------
 
 def align_tol(dist, p):
@@ -261,15 +270,17 @@ class WaypointResult:
 
 class Navigator:
     """look() -> (accepted {id: TagObs}, rejected {id: reason});
-    execute(step) runs it and may return its (t_start, t_stop)."""
+    execute(step) runs it and may return its (t_start, t_stop);
+    guard(pose, move) -> False stops a drive with Replan (HW4; None = no check)."""
 
-    def __init__(self, estimator, calib, params, look, execute, log=None):
+    def __init__(self, estimator, calib, params, look, execute, log=None, guard=None):
         self.estimator = estimator
         self.calib = calib
         self.p = params
         self.look = look
         self.execute = execute
         self.log = log or NavLog()
+        self.guard = guard
         self.all_rejected_looks = 0
 
     def pose(self):
@@ -303,6 +314,8 @@ class Navigator:
         if step.T is None:
             return None
         before = self.pose()
+        if self.guard is not None and move.kind == 'drive' and not self.guard(before, move):
+            raise Replan(before, move)
         timing = self.execute(step)
         self.predict(step_motion(step))
         self.log.on_step(goal_index, step, before, self.pose(),

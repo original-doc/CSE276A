@@ -16,6 +16,7 @@ setup(
         ('share/' + package_name + '/config/open_loop', glob('config/open_loop/*.yaml')),
         ('share/' + package_name + '/config/hw2', glob('config/hw2/*.yaml')),
         ('share/' + package_name + '/config/hw3', glob('config/hw3/*.yaml')),
+        ('share/' + package_name + '/config/hw4', glob('config/hw4/*.yaml')),
     ],
     install_requires=[
         'setuptools',
@@ -38,6 +39,7 @@ setup(
             'hw2_probe = robot_control.hw2_probe:main',
             'hw2_nav = robot_control.hw2_nav:main',
             'hw3_slam = robot_control.hw3_slam:main',
+            'hw4_nav = robot_control.hw4_nav:main',
             'fit_spin_pulse = robot_control.fit_spin_pulse:main',
         ],
     },

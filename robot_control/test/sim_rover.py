@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from robot_control.ol_model import Calibration, PulseModel
 from robot_control.se2 import Pose2, angle_between, to_child, wrap_angle
 from robot_control.tag_obs import make_obs
+from robot_control.world import segment_enters_rect
 
 
 @dataclass
@@ -26,12 +27,16 @@ class SimNoise:
 
 
 class SimRover:
-    def __init__(self, landmark_map, start, rng, noise=None):
+    """occluders: [world.Rect] that block the view (HW4 box); trail: true pose after each step."""
+
+    def __init__(self, landmark_map, start, rng, noise=None, occluders=()):
         self.map = landmark_map
         self.true = start
         self.rng = rng
         self.n = noise or SimNoise()
+        self.occluders = list(occluders)
         self.steps = []
+        self.trail = [start]
 
     def execute(self, step):
         self.steps.append(step)
@@ -42,6 +47,7 @@ class SimRover:
             slow_fine = step.cmd == 0.25 and step.T is not None and step.T >= self.n.slow_fine_T
             scale = self.n.slow_fine_scale if slow_fine else 1.0
             self.spin(sign * math.radians(step.amount) * scale)
+        self.trail.append(self.true)
 
     def drive(self, d):
         n = self.n
@@ -61,8 +67,10 @@ class SimRover:
         d = math.hypot(x, y)
         oblique = angle_between(math.cos(lm.yaw), math.sin(lm.yaw),
                                 self.true.x - lm.x, self.true.y - lm.y)
+        hidden = any(segment_enters_rect((self.true.x, self.true.y), (lm.x, lm.y), o)
+                     for o in self.occluders)
         return (0.25 <= d <= self.n.max_dist and abs(math.atan2(y, x)) <= self.n.half_fov
-                and oblique <= self.n.max_oblique)
+                and oblique <= self.n.max_oblique and not hidden)
 
     def look(self):
         seen = {}
